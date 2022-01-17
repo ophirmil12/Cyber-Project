@@ -58,55 +58,59 @@
 			}
 			
 			async function loadPrisoner(prisonerData) {
-				const thisPrisoner = JSON.parse(prisonerData);
-				/* thisPrisoner[]:
-				0: ID
-				1: name
-				2: national_ID
-				3: last_location[lat, lng]
-				4: last_location_time
-				5: status
-				6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
-				*/
-				// display the data of the chosen prisoner
-				document.getElementById("prisonerID").innerHTML = thisPrisoner[0];
-				document.getElementById("prisonerDate").innerHTML = thisPrisoner[4];
-				document.getElementById("prisonerLocation").innerHTML = thisPrisoner[3][0].toString() + ", " + thisPrisoner[3][1].toString();
-				// display personal data of the prisoner
-				document.getElementById("prisonerName").innerHTML = thisPrisoner[1];
-				document.getElementById("prisonerNationalID").innerHTML = thisPrisoner[2];
-				//other things:
-				document.getElementById("DataTag").innerHTML = "DATA:";
-				document.getElementById("LastLocationTag").innerHTML = "LAST LOCATION:";
-				// display the current location on the map
-				var myLatlng = new google.maps.LatLng(thisPrisoner[3][0], thisPrisoner[3][1]);
-				var mapOptions = {
-					// TODO - zoom change by the most farrer circle
-					// TODO - if needed you can erase old markers with marker.setMap(null);
-					// TODO - add a picture of green or red by the status (on the marker add "icon: image", where image is a url link)
-					zoom: 12,
-					center: myLatlng
-				}
-				var map = new google.maps.Map(document.getElementById("googleMap"), mapOptions);
-				var newMarker = new google.maps.Marker({
-					position: myLatlng,
-					title:"Current Location"
-				});
-				newMarker.setMap(map);
-				//display red circles on the map
-				for (const redCircle in thisPrisoner[6]) {
-					// Add the circle for this redCircle to the map
-					const newCircle = new google.maps.Circle({
-						strokeColor: "#FF0000",
-						strokeOpacity: 0.8,
-						strokeWeight: 2,
-						fillColor: "#FF0000",
-						fillOpacity: 0.35,
-						map,
-						center: {lat: thisPrisoner[6][redCircle][3], lng: thisPrisoner[6][redCircle][4]},
-						radius: thisPrisoner[6][redCircle][2],
+				if (prisonerData != "SubmitPrisonerError") {
+					const thisPrisoner = JSON.parse(prisonerData);
+					/* thisPrisoner[]:
+					0: ID
+					1: name
+					2: national_ID
+					3: last_location[lat, lng]
+					4: last_location_time
+					5: status
+					6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
+					*/
+					// display the data of the chosen prisoner
+					document.getElementById("prisonerID").innerHTML = thisPrisoner[0];
+					document.getElementById("prisonerDate").innerHTML = thisPrisoner[4];
+					document.getElementById("prisonerLocation").innerHTML = thisPrisoner[3][0].toString() + ", " + thisPrisoner[3][1].toString();
+					// display personal data of the prisoner
+					document.getElementById("prisonerName").innerHTML = thisPrisoner[1];
+					document.getElementById("prisonerNationalID").innerHTML = thisPrisoner[2];
+					//other things:
+					document.getElementById("DataTag").innerHTML = "DATA:";
+					document.getElementById("LastLocationTag").innerHTML = "LAST LOCATION:";
+					// display the current location on the map
+					var myLatlng = new google.maps.LatLng(thisPrisoner[3][0], thisPrisoner[3][1]);
+					var mapOptions = {
+						// TODO - zoom change by the most farrer circle
+						// TODO - if needed you can erase old markers with marker.setMap(null);
+						// TODO - add a picture of green or red by the status (on the marker add "icon: image", where image is a url link)
+						zoom: 12,
+						center: myLatlng
+					}
+					var map = new google.maps.Map(document.getElementById("googleMap"), mapOptions);
+					var newMarker = new google.maps.Marker({
+						position: myLatlng,
+						title:"Current Location"
 					});
-				}
+					newMarker.setMap(map);
+					//display red circles on the map
+					for (const redCircle in thisPrisoner[6]) {
+						// Add the circle for this redCircle to the map
+						const newCircle = new google.maps.Circle({
+							strokeColor: "#FF0000",
+							strokeOpacity: 0.8,
+							strokeWeight: 2,
+							fillColor: "#FF0000",
+							fillOpacity: 0.35,
+							map,
+							center: {lat: thisPrisoner[6][redCircle][3], lng: thisPrisoner[6][redCircle][4]},
+							radius: thisPrisoner[6][redCircle][2],
+						});
+					}
+				} else {
+					document.getElementById("DataTag").innerHTML = "Submiting Error or No Location messured yet by the prisoner. </br>Please wait few seconds and try again.";
+				}	
 			}
 			
 

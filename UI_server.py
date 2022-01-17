@@ -23,7 +23,10 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
         """
         prisoner_id = content["input"]
         prisoner_personal_data = db.get_prisoner_personal_data(prisoner_id)[0]
-        prisoner_location = db.get_prisoner_locations(prisoner_id)[-1]
+        try:
+            prisoner_location = db.get_prisoner_locations(prisoner_id)[-1]
+        except IndexError:
+            prisoner_location = [0.0, 0.0]
         prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
         data_to_return = [prisoner_id, prisoner_personal_data[1], prisoner_personal_data[2],
                           [prisoner_location[3], prisoner_location[4]], prisoner_location[2],
@@ -94,6 +97,7 @@ def prisoner_new_location(content, db):
         location_placer_lng = 4
         circle_type_placer = 5
         for red_circle in all_red_circles:
+            print("in")
             if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
                                        (location_lat, location_lng)) <= red_circle[radius_placer]:
                 # the prisoner_data is in the circle
