@@ -1,0 +1,74 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        Prisoners Tracking System - Miller Production - Alert Log
+    </title>
+    <script>
+	// sending request to the server by future function, and the arguments to the function
+	async function talkToServer(type, input, callback) {
+		const req = await fetch("/ajax", {
+			method: 'POST',
+			body: JSON.stringify({type: type, input: input})
+		})
+		const body = await req.text();
+		callback(body);
+	}
+	
+	// the loop
+	////////////////////////change the loop time
+	const loopTime = 3
+	var intervalID = window.setInterval(LoopCallBack, loopTime*1000);
+	// what the loop does
+	function LoopCallBack() { 
+		talkToServer("get_all_problems_and_new_alerts", "", UpdateDataToPage);
+	}
+	
+	// the way we appending the new message
+	function CreateMessage(message) {
+		const element = document.createElement('p');
+		element.innerHTML = message + '</br>';
+		return element;
+	}
+	
+	// adding alerts to the alert log
+	function UpdateDataToPage(NewData) {
+		const Data = JSON.parse(NewData);
+		const AlertList = document.getElementById("AlertID");
+		console.log(Data);
+		for (const line in Data) {
+			if(Data[line][3] == 1) {
+				AlertList.appendChild(CreateMessage(Data[line][0].toString() + ", Alert!"));
+			}
+			/*
+			if(Data[line][3] == 0) {
+				LogList.appendChild(CreateMessage(Data[line][0].toString() + ", All Good"));
+			}
+			*/
+		}
+	}
+	
+    </script>
+</head>
+<body>
+
+	
+	<div style="height:50%">
+	
+		<h2>ALERTS:</h2>
+		<div id="AlertID"></div>
+	
+	</div>
+	
+	<!--
+	<div style="height:50%">
+	
+		<h2>Full Log:</h2>
+		<div id ="LogID"></div>
+	
+	</div>
+	-->
+	
+</body>
+</html>

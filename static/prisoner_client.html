@@ -1,0 +1,75 @@
+<html>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<title>Prisoner - Miller Production</title>
+		<script>
+		
+		// sending request to the server by future function, and the arguments to the function
+		async function talkToServer(type, input, callback) {
+			try {
+				const req = await fetch("/ajax", {
+					method: 'POST',
+					body: JSON.stringify({type: type, input: input})
+				})
+				const body = await req.text();
+				callback(body);
+			}
+			catch (error) {}
+		}
+	
+		//when pressing the submit button
+		function submitButton() {
+			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
+			var Name = document.getElementById("Name").value;
+			talkToServer("new_prisoner", JSON.stringify([PrisonerNationalId, Name]), submitButtonResponse);
+		}
+	
+		//after sending the data to the server, showing the response
+		function submitButtonResponse(Data) {
+			document.getElementById("response").innerHTML = Data;
+		}
+		
+		// the loop
+		const sec = 10
+		var intervalID = window.setInterval(LoopCallBack, 1000*sec);
+		// what the loop does
+		function LoopCallBack() {
+			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
+			////////////////////////get location
+			navigator.geolocation.getCurrentPosition(showPosition);
+			var Latitude = position.coords.latitude;
+			var Longitude = position.coords.longitude;
+			////////////////////////
+			talkToServer("prisoner_new_location", JSON.stringify([PrisonerNationalId, Latitude, Longitude]), UpdateDataToPage);
+		}
+		
+		//
+		function UpdateDataToPage(NewData) {
+			document.getElementById("response").innerHTML = NewData;
+		}
+
+		</script>
+	</head>
+	
+	<body style="background-color: aliceblue">
+	
+		<h1>Prisoner Log In System</h1>
+		
+		<div>
+		
+		<form id="NewPrisoner">
+			<label for="PrisonerNationalId">Prisoner National ID:</label>
+			<input type="text" id="PrisonerNationalId" name="PrisonerNationalId"><br><br>
+			
+			<label for="Name">Name:</label>
+			<input type="text" id="Name" name="Name"><br><br>
+		</form>
+		
+		<button onclick='submitButton()'> Submit </button>
+		
+		<p id="response"></p>
+	
+	</div>
+	</body>
+</html>

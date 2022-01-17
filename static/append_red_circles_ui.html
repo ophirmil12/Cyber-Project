@@ -1,0 +1,74 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        Prisoners Tracking System - Miller Production - Appending Red-Zone Circles
+    </title>
+    <script>
+	
+	// sending request to the server by future function, and the arguments to the function
+	async function talkToServer(type, input, callback) {
+		const req = await fetch("/ajax", {
+			method: 'POST',
+			body: JSON.stringify({type: type, input: input})
+		})
+		const body = await req.text();
+		callback(body);
+	}
+	
+	//when pressing the submit button
+	function submitButton() {
+		var PrisonerId = document.getElementById("PrisonerId").value;
+		var lat = document.getElementById("lat").value;
+		var lng = document.getElementById("lng").value;
+		var type = document.getElementById("type").value;
+		var radius = document.getElementById("radius").value;
+		var circle_type = document.getElementById("circle_type").value;
+		talkToServer("add_or_remove_red_circle", JSON.stringify([PrisonerId, lat, lng, type, radius, circle_type]), submitButtonResponse);
+	}
+	
+	//after sending the data to the server, showing the response
+	function submitButtonResponse(Data) {
+		document.getElementById("response").innerHTML = Data;
+
+	}
+	
+    </script>
+</head>
+<body>
+
+	
+	<div>
+		<h2>Append Red Circles:</h2>
+		
+		<form id="RedCircle">
+			<label for="PrisonerId">Prisoner ID:</label>
+			<input type="text" id="PrisonerId" name="PrisonerId"><br><br>
+			
+			<label for="lat">Latitude:</label>
+			<input type="text" id="lat" name="lat"><br><br>
+			
+			<label for="lng">Longitude:</label>
+			<input type="text" id="lng" name="lng"><br><br>
+			
+			<label for="type">ADD/REMOVE:</label>
+			<input type="text" id="type" name="type"><br><br>
+			
+			<label for="radius">Radius (to ADD, by meters):</label>
+			<input type="text" id="radius" name="radius"><br><br>
+			
+			<label for="circle_type">Circle Type (to add, 0=allowed only; 1=not allowed):</label>
+			<input type="text" id="circle_type" name="circle_type"><br><br>
+			
+		</form>
+		
+		<button onclick='submitButton()'> Submit </button>
+		
+		<p id="response"></p>
+	
+	</div>
+
+	
+</body>
+</html>
