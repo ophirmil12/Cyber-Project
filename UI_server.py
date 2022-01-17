@@ -75,6 +75,7 @@ def new_prisoner(content, db):
         prisoner_name = data[1]
         db.insert_new_prisoner(prisoner_id=prisoner_national_id, name=prisoner_name,
                                national_identifier=prisoner_national_id, status=False)
+        return "Good"
     except:
         return "ValueError"
 

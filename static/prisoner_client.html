@@ -17,6 +17,9 @@
 			}
 			catch (error) {}
 		}
+		
+		
+		
 	
 		//when pressing the submit button
 		function submitButton() {
@@ -27,26 +30,34 @@
 	
 		//after sending the data to the server, showing the response
 		function submitButtonResponse(Data) {
-			document.getElementById("response").innerHTML = Data;
+			document.getElementById("responseNewPrisoner").innerHTML = "New Prisoner: " + Data;
+			// the loop
+			const sec = 10
+			var intervalID = window.setInterval(LoopCallBack, 1000*sec);
 		}
 		
-		// the loop
-		const sec = 10
-		var intervalID = window.setInterval(LoopCallBack, 1000*sec);
 		// what the loop does
 		function LoopCallBack() {
-			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
-			////////////////////////get location
-			navigator.geolocation.getCurrentPosition(showPosition);
-			var Latitude = position.coords.latitude;
-			var Longitude = position.coords.longitude;
-			////////////////////////
-			talkToServer("prisoner_new_location", JSON.stringify([PrisonerNationalId, Latitude, Longitude]), UpdateDataToPage);
+			navigator.geolocation.getCurrentPosition(showPosition, locationError);
 		}
 		
-		//
+		// if got a location - it sends it to the server
+		function showPosition(position) {
+			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
+			const CurrentLatitude = position.coords.latitude;
+			const CurrentLongitude = position.coords.longitude;
+			console.log(CurrentLatitude);
+			talkToServer("prisoner_new_location", JSON.stringify([PrisonerNationalId, CurrentLatitude, CurrentLongitude]), UpdateDataToPage);
+		}
+		// in case of an location_error
+		function locationError(errorType) {
+			console.log(errorType);	
+		}
+
+		
+		// after sending the data to the server, showing the response
 		function UpdateDataToPage(NewData) {
-			document.getElementById("response").innerHTML = NewData;
+			document.getElementById("response").innerHTML = "Getting Locations: " + NewData;
 		}
 
 		</script>
@@ -69,6 +80,7 @@
 		<button onclick='submitButton()'> Submit </button>
 		
 		<p id="response"></p>
+		<p id="responseNewPrisoner"></p>
 	
 	</div>
 	</body>
