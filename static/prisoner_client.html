@@ -33,7 +33,9 @@
 			document.getElementById("responseNewPrisoner").innerHTML = "New Prisoner: " + Data;
 			// the loop
 			const sec = 10
-			var intervalID = window.setInterval(LoopCallBack, 1000*sec);
+			if(Data == "Good") {
+				var intervalID = window.setInterval(LoopCallBack, 1000*sec);
+			}
 		}
 		
 		// what the loop does
@@ -52,6 +54,8 @@
 		// in case of an location_error
 		function locationError(errorType) {
 			console.log(errorType);	
+			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
+			talkToServer("prisoner_unknown_location", JSON.stringify(PrisonerNationalId), UpdateDataToPage);
 		}
 
 		

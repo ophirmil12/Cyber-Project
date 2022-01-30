@@ -120,6 +120,16 @@ def prisoner_new_location(content, db):
         return "LocationError"
 
 
+def prisoner_unknown_location(content, db):
+    prisoner_id = json.loads(content["input"])
+    try:
+        db.change_prisoner_status(prisoner_id, new_status=1)
+        return "GettingPrisonerLocationError"
+    except:
+        print("Inner error. please call the code manager")
+        return "GettingPrisonerLocationErrorAndDataBaseError"
+
+
 # the ajax calls get checked by names
 def commend_checker(content, db):
     # command type: when pressing the submit button - sending prisoner_data`s data to the UI
@@ -149,6 +159,9 @@ def commend_checker(content, db):
     # command type: reading new location and writing it to DB
     elif content["type"] == "prisoner_new_location":
         return prisoner_new_location(content, db)
+
+    elif content["type"] == "prisoner_unknown_location":
+        return prisoner_unknown_location(content, db)
 
     # command type: unknown
     else:
