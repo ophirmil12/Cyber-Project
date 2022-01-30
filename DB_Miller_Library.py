@@ -37,7 +37,7 @@ class Database:
         self.conn.execute('''CREATE TABLE IF NOT EXISTS prisoners
                         ( prisoner_id INTEGER PRIMARY KEY NOT NULL,  
                         name TEXT NOT NULL, 
-                        national_identifier INT NOT NULL, 
+                        national_identifier INT, 
                         status NUMERIC NOT NULL )''')
 
     # close database file, and emptying all tables

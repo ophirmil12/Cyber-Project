@@ -97,11 +97,17 @@
 					//display red circles on the map
 					for (const redCircle in thisPrisoner[6]) {
 						// Add the circle for this redCircle to the map
+						if(thisPrisoner[6][redCircle][5]==1) {
+							var colorA = "#FF0000"
+						}
+						else {
+							var colorA = "#00FF00"
+						}
 						const newCircle = new google.maps.Circle({
 							strokeColor: "#FF0000",
 							strokeOpacity: 0.8,
 							strokeWeight: 2,
-							fillColor: "#FF0000",
+							fillColor: colorA,
 							fillOpacity: 0.35,
 							map,
 							center: {lat: thisPrisoner[6][redCircle][3], lng: thisPrisoner[6][redCircle][4]},
