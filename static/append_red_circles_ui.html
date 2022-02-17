@@ -1,42 +1,47 @@
 <html>
-<head>
-    <meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>
-        Prisoners Tracking System - Miller Production - Appending Red-Zone Circles
-    </title>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			Prisoners Tracking System - Miller Production - Appending Red-Zone Circles
+		</title>
+		<link rel="icon" href="favicon.png">
+		
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+		
     <script>
 	
-	// sending request to the server by future function, and the arguments to the function
-	async function talkToServer(type, input, callback) {
-		const req = await fetch("/ajax", {
-			method: 'POST',
-			body: JSON.stringify({type: type, input: input})
-		})
-		const body = await req.text();
-		callback(body);
-	}
+		// sending request to the server by future function, and the arguments to the function
+		async function talkToServer(type, input, callback) {
+			const req = await fetch("/ajax", {
+				method: 'POST',
+				body: JSON.stringify({type: type, input: input})
+			})
+			const body = await req.text();
+			callback(body);
+		}
 	
-	//when pressing the submit button
-	function submitButton() {
-		var PrisonerId = document.getElementById("PrisonerId").value;
-		var lat = document.getElementById("lat").value;
-		var lng = document.getElementById("lng").value;
-		var type = document.getElementById("type").value;
-		var radius = document.getElementById("radius").value;
-		var circle_type = document.getElementById("circle_type").value;
-		talkToServer("add_or_remove_red_circle", JSON.stringify([PrisonerId, lat, lng, type, radius, circle_type]), submitButtonResponse);
-	}
+		//when pressing the submit button
+		function submitButton() {
+			var PrisonerId = document.getElementById("PrisonerId").value;
+			var lat = document.getElementById("lat").value;
+			var lng = document.getElementById("lng").value;
+			var type = document.getElementById("type").value;
+			var radius = document.getElementById("radius").value;
+			var circle_type = document.getElementById("circle_type").value;
+			talkToServer("add_or_remove_red_circle", JSON.stringify([PrisonerId, lat, lng, type, radius, circle_type]), submitButtonResponse);
+		}
+		
+		//after sending the data to the server, showing the response
+		function submitButtonResponse(Data) {
+			document.getElementById("response").innerHTML = Data;
 	
-	//after sending the data to the server, showing the response
-	function submitButtonResponse(Data) {
-		document.getElementById("response").innerHTML = Data;
-
-	}
-	
-    </script>
-</head>
-<body>
+		}
+		
+		</script>
+	</head>
+<body style="background: ghostwhite">
 
 	
 	<div>
