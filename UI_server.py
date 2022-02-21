@@ -96,25 +96,30 @@ def prisoner_new_location(content, db):
         location_placer_lat = 3
         location_placer_lng = 4
         circle_type_placer = 5
+        is_problem = 0
         for red_circle in all_red_circles:
             print("in")
             if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
                                        (location_lat, location_lng)) <= red_circle[radius_placer]:
-                # the prisoner_data is in the circle
+                # the prisoner is in the circle
                 if red_circle[circle_type_placer] == "1":
-                    # Not allowed
-                    db.change_prisoner_status(client_national_id, 1)
+                    # Not allowed in the circle - Problem
+                    is_problem += 1
                 else:
-                    # allowed
-                    db.change_prisoner_status(client_national_id, 0)
+                    # allowed only in the circle - Good
+                    is_problem += 0
             else:
-                # the prisoner_data is out of the circle
+                # the prisoner is out of the circle
                 if red_circle[circle_type_placer] == "1":
-                    # Not allowed
-                    db.change_prisoner_status(client_national_id, 0)
+                    # Not allowed in the circle - Good
+                    is_problem += 0
                 else:
-                    # allowed
-                    db.change_prisoner_status(client_national_id, 1)
+                    # allowed only in the circle - Problem
+                    is_problem += 1
+        if is_problem >= 1:
+            db.change_prisoner_status(client_national_id, 1)
+        else:
+            db.change_prisoner_status(client_national_id, 0)
         return "Good"
     except:
         return "LocationError"
