@@ -2,10 +2,31 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
 		<title>
 			Prisoners Tracking System - Miller Production - Appending Red-Zone Circles
 		</title>
+		
 		<link rel="icon" href="favicon.png">
+		
+		<style>
+			.dropdown {
+				position: relative;
+				display: inline-block;
+			}
+			.dropdown-content {
+				display: none;
+				position: absolute;
+				background-color: #f9f9f9;
+				min-width: 10px;
+				box-shadow: 0px 8px 16px 0px rgba(0,0,0.1,0.2);
+				padding: 10px 10px;
+				z-index: 1;
+			}
+			.dropdown:hover .dropdown-content {
+				display: block;
+			}
+		</style>
 		
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
@@ -47,7 +68,7 @@
 	<div>
 		<h2>Append Red Circles:</h2>
 		
-		<form id="RedCircle">
+		<form id="RedCircle" class="dropdown">
 			<label for="PrisonerId">Prisoner ID:</label>
 			<input type="text" id="PrisonerId" name="PrisonerId"><br><br>
 			
@@ -57,13 +78,23 @@
 			<label for="lng">Longitude:</label>
 			<input type="text" id="lng" name="lng"><br><br>
 			
-			<label for="type">ADD/REMOVE:</label>
+			
+			<label for="type">
+				<span>ADD/REMOVE</span>
+					<div class="dropdown-content">
+						<p>The function - adding or removing</p>
+					</div>
+			</label>
 			<input type="text" id="type" name="type"><br><br>
 			
 			<label for="radius">Radius (to ADD, by meters):</label>
 			<input type="text" id="radius" name="radius"><br><br>
 			
-			<label for="circle_type">Circle Type (to add, 0=allowed only; 1=not allowed):</label>
+			<label for="circle_type"><span>Circle Type</span>
+				<div class="dropdown-content">
+					<p>to add, 0=allowed only; 1=not allowed</p>
+				</div>
+			</label>
 			<input type="text" id="circle_type" name="circle_type"><br><br>
 			
 		</form>
