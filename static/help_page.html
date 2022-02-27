@@ -1,0 +1,156 @@
+<html>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<head>
+	
+		<title>
+			Help - Prisoners Tracking System
+		</title>
+		
+		<link rel="icon" href="favicon.png">
+		
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+	
+		<style>
+			#leftbox {
+                float:left; 
+                background:gainsboro;
+                width:25%;
+                height:25%;
+				border-style:solid;
+				border-color:ghostwhite;
+            }
+			
+            #middlebox{
+                float:left; 
+                background:gainsboro;
+                width:25%;
+                height:25%;
+				border-style:solid;
+				border-color:ghostwhite;
+            }
+			
+            #rightbox{
+                float:right;
+                background:gainsboro;
+                width:25%;
+                height:25%;
+				border-style:solid;
+				border-color:ghostwhite;
+            }
+			
+			#more_details_box{
+				float:right;
+                background:white;
+                width:100%;
+                height:40%;
+				border-style:solid;
+				border-color:ghostwhite;
+			}
+		
+		</style>
+		
+		<script>
+		
+			// sending request to the server by future function, and the arguments to the function
+			async function talkToServer(type, input, callback) {
+				const req = await fetch("/ajax", {
+					method: 'POST',
+					body: JSON.stringify({type: type, input: input})
+				})
+				const body = await req.text();
+				callback(body);
+			}
+			
+			//getting help info - for users
+			function help_text_for_users() {
+				talkToServer("get_help_text", "for_users", loadHelpData);
+			}
+			
+			//getting help info - for admins
+			function help_text_for_admins() {
+				talkToServer("get_help_text", "for_admins", loadHelpData);
+			}
+			
+			//getting help info - for developers
+			function help_text_for_developers() {
+				talkToServer("get_help_text", "for_developers", loadHelpData);
+			}
+			
+			//getting help info - for common
+			function help_text_for_common() {
+				talkToServer("get_help_text", "for_common", loadHelpData);
+			}
+			
+			//showing the help data in the page
+			function loadHelpData(help_text){
+				const thisData = JSON.parse(help_text);
+				console.log(thisData);
+				document.getElementById("help_data").innerHTML = thisData;
+			}
+			
+		</script>
+	
+	</head>
+	
+	<body style="background: ghostwhite">
+	
+		<h1>Prisoners Tracking System - Help</h1>
+		
+		<!--mainly saying hi-->
+		<div name="introduction">
+		
+			<!-- main bar --> 
+			<nav class="w3-bar w3-black">
+				<a href="/main" class="button">Home</a>
+				<a href="/prisoner" class="button">Prisoner</a>
+				<a href="/log" class="button">Alert Log</a>
+				<a href="/help" class="button">Help</a>
+			</nav>
+			
+			<h2>How can we help?</h2>
+		
+		</div>
+		
+		<!--choosing the help option-->
+		<div name="options">
+		
+			<div id="leftbox">
+				<button onclick="help_text_for_users()">For Users</button>
+			</div>
+			
+			<div id="middlebox">
+				<button onclick="help_text_for_admins()">For Admins</button>
+			</div>
+			
+			<div id="middlebox">
+				<button onclick="help_text_for_developers()">For Developers</button>
+			</div>
+			
+			<div id="rightbox">
+				<button onclick="help_text_for_common()">Commom F & Q</button>
+			</div>
+			
+		</div>
+		
+		<!--the place where the answers will appear-->
+		<div name="open" id="more_details_box">
+			<p id="help_data">
+			</p>
+		</div>
+		
+		<!--more details you can get in...-->
+		<div name="for_more_details" style="width:100%; margin:0 auto; height:20%">
+			<p style="text-align:center">For more information please contact:</p>
+			
+			<a href="mailto: miller.productions@gmail.com">
+				<p style="text-align:center">
+					In Mail
+				</p>
+			</a>
+		</div>
+		
+	</body>
+</html>
