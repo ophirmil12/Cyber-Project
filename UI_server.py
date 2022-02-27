@@ -135,6 +135,27 @@ def prisoner_unknown_location(content, db):
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
 
+def get_help_text(content):
+    help_type = content["input"]
+    try:
+        if help_type == "for_users":
+            text = open("help_center\help_for_users.txt", "r").read()
+            return json.dumps(text)
+        elif help_type == "for_admins":
+            text = open("help_center\help_for_admins.txt", "r").read()
+            return json.dumps(text)
+        elif help_type == "for_developers":
+            text = open("help_center\help_for_developers.txt", "r").read()
+            return json.dumps(text)
+        elif help_type == "for_common":
+            text = open("help_center\common_f_and_q.txt", "r").read()
+            return json.dumps(text)
+        else:
+            return json.dumps("CommandNotFound")
+    except:
+        return json.dumps("TextFileProblem")
+
+
 # the ajax calls get checked by names
 def commend_checker(content, db):
     # command type: when pressing the submit button - sending prisoner_data`s data to the UI
@@ -165,8 +186,13 @@ def commend_checker(content, db):
     elif content["type"] == "prisoner_new_location":
         return prisoner_new_location(content, db)
 
+    # error in getting the location from the client
     elif content["type"] == "prisoner_unknown_location":
         return prisoner_unknown_location(content, db)
+
+    # help center texts and ect.
+    elif content["type"] == "get_help_text":
+        return get_help_text(content)
 
     # command type: unknown
     else:
@@ -185,6 +211,12 @@ def user():
     print(content)
     # checking what method need to be used
     return commend_checker(content, db)
+
+
+# help - mainly explanation on the functions in the site
+@app.route('/help')
+def help_page():
+    return app.send_static_file("help_page.html")
 
 
 # iframe #2 - the live alert log
