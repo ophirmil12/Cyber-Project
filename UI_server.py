@@ -135,6 +135,7 @@ def prisoner_unknown_location(content, db):
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
 
+# in use in get_help_text
 def get_text_from_file(file_name):
     text = open(f"help_center\\" + file_name, "r").read()
     return json.dumps(text)
