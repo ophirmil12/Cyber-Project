@@ -49,6 +49,28 @@
 				border-style:solid;
 				border-color:ghostwhite;
 			}
+			
+			.button{
+				background-color: #555555;
+				border: none;
+				color: white;
+				padding: 15px 25%;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 20px;
+				position: relative;
+				top: 50%;
+				left: 50%;
+				-ms-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			.button:hover {
+				box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+			}
+			.button:active {
+				box-shadow: 0 12px 16px 0 rgba(0,0,0,0.5), 0 17px 60px 0 rgba(0,0,0,0.3);
+			}
 		
 		</style>
 		
@@ -86,9 +108,18 @@
 			
 			//showing the help data in the page
 			function loadHelpData(help_text){
-				const thisData = JSON.parse(help_text);
-				console.log(thisData);
-				document.getElementById("help_data").innerHTML = thisData;
+				let thisData = JSON.stringify(JSON.parse(help_text))
+				//cutting out the ""
+				thisData = thisData.substring(1, thisData.length - 1);
+				//spliting by newlines
+				let finalData = "";
+				var lines = thisData.split("\\n");
+				//adding html newlines
+				for(var i = 0;i < lines.length;i++){
+					finalData = finalData + lines[i] + "</br>"
+				}
+				//adding the help-data to the page
+				document.getElementById("help_data").innerHTML = finalData;
 			}
 			
 		</script>
@@ -104,10 +135,9 @@
 		
 			<!-- main bar --> 
 			<nav class="w3-bar w3-black">
-				<a href="/main" class="button">Home</a>
-				<a href="/prisoner" class="button">Prisoner</a>
-				<a href="/log" class="button">Alert Log</a>
-				<a href="/help" class="button">Help</a>
+				<a href="/main" class="url">Home</a>
+				<a href="/prisoner" class="url">Prisoner</a>
+				<a href="/help" class="url">Help</a>
 			</nav>
 			
 			<h2>How can we help?</h2>
@@ -118,27 +148,26 @@
 		<div name="options">
 		
 			<div id="leftbox">
-				<button onclick="help_text_for_users()">For Users</button>
+				<button class="button" onclick="help_text_for_users()">For Users</button>
 			</div>
 			
 			<div id="middlebox">
-				<button onclick="help_text_for_admins()">For Admins</button>
+				<button class="button" onclick="help_text_for_admins()">For Admins</button>
 			</div>
 			
 			<div id="middlebox">
-				<button onclick="help_text_for_developers()">For Developers</button>
+				<button class="button" onclick="help_text_for_developers()">For Developers</button>
 			</div>
 			
 			<div id="rightbox">
-				<button onclick="help_text_for_common()">Commom F & Q</button>
+				<button class="button" onclick="help_text_for_common()">Commom F & Q</button>
 			</div>
 			
 		</div>
 		
 		<!--the place where the answers will appear-->
 		<div name="open" id="more_details_box">
-			<p id="help_data">
-			</p>
+			<div id="help_data"></div>
 		</div>
 		
 		<!--more details you can get in...-->

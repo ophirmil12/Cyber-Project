@@ -135,21 +135,22 @@ def prisoner_unknown_location(content, db):
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
 
+def get_text_from_file(file_name):
+    text = open(f"help_center\\" + file_name, "r").read()
+    return json.dumps(text)
+
+
 def get_help_text(content):
     help_type = content["input"]
     try:
         if help_type == "for_users":
-            text = open("help_center\help_for_users.txt", "r").read()
-            return json.dumps(text)
+            return get_text_from_file("help_for_users.txt")
         elif help_type == "for_admins":
-            text = open("help_center\help_for_admins.txt", "r").read()
-            return json.dumps(text)
+            return get_text_from_file("help_for_admins.txt")
         elif help_type == "for_developers":
-            text = open("help_center\help_for_developers.txt", "r").read()
-            return json.dumps(text)
+            return get_text_from_file("help_for_developers.txt")
         elif help_type == "for_common":
-            text = open("help_center\common_f_and_q.txt", "r").read()
-            return json.dumps(text)
+            return get_text_from_file("common_f_and_q.txt")
         else:
             return json.dumps("CommandNotFound")
     except:
