@@ -42,28 +42,36 @@
 		function submitButtonResponse(Data) {
 			document.getElementById("responseNewPrisoner").innerHTML = "New Prisoner: " + Data;
 			// the loop
-			const sec = 10
+			const sec = 10;
 			if(Data == "Good") {
 				var intervalID = window.setInterval(LoopCallBack, 1000*sec);
 			}
 		}
 		
 		// what the loop does
-		function LoopCallBack() {
-			navigator.geolocation.getCurrentPosition(showPosition, locationError);
+		function LoopCallBack(){
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showPosition);
+			}
+			else { 
+				locationError(errorType);
+			}
 		}
 		
 		// if got a location - it sends it to the server
 		function showPosition(position) {
+			/////the error somewhere here - in the "position" argument
+			//???
+			console.log(position);
+			
 			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
-			const CurrentLatitude = position.coords.latitude;
-			const CurrentLongitude = position.coords.longitude;
-			console.log(CurrentLatitude);
+			let CurrentLatitude = position.coords.latitude;
+			let CurrentLongitude = position.coords.longitude;
 			talkToServer("prisoner_new_location", JSON.stringify([PrisonerNationalId, CurrentLatitude, CurrentLongitude]), UpdateDataToPage);
 		}
 		// in case of an location_error
 		function locationError(errorType) {
-			console.log(errorType);	
+			console.log(errorType);
 			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
 			talkToServer("prisoner_unknown_location", JSON.stringify(PrisonerNationalId), UpdateDataToPage);
 		}
@@ -79,7 +87,7 @@
 	
 	<body style="background: ghostwhite">
 	
-		<h1>Prisoner Log In System</h1>
+		<h1>Prisoner Login System</h1>
 		
 		<div>
 		
