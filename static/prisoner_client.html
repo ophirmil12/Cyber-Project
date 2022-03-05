@@ -8,7 +8,7 @@
 			Prisoner - Miller Production
 		</title>
 		
-		<link rel="icon" href="favicon.png">
+		<link rel="favicon" href="{{ url_for('static', filename='favicon.ico') }}">
 		
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
@@ -27,9 +27,6 @@
 			}
 			catch (error) {}
 		}
-		
-		
-		
 	
 		//when pressing the submit button
 		function submitButton() {
@@ -44,6 +41,7 @@
 			// the loop
 			const sec = 10;
 			if(Data == "Good") {
+				console.log("loop start.");
 				var intervalID = window.setInterval(LoopCallBack, 1000*sec);
 			}
 		}
@@ -51,7 +49,10 @@
 		// what the loop does
 		function LoopCallBack(){
 			if (navigator.geolocation) {
+				console.log("geolocation good.");
 				navigator.geolocation.getCurrentPosition(showPosition);
+				///////the error is in the use of flask - the function above works, but only without the falsk
+				//????????????????
 			}
 			else { 
 				locationError(errorType);
@@ -60,8 +61,6 @@
 		
 		// if got a location - it sends it to the server
 		function showPosition(position) {
-			/////the error somewhere here - in the "position" argument
-			//???
 			console.log(position);
 			
 			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
@@ -69,6 +68,7 @@
 			let CurrentLongitude = position.coords.longitude;
 			talkToServer("prisoner_new_location", JSON.stringify([PrisonerNationalId, CurrentLatitude, CurrentLongitude]), UpdateDataToPage);
 		}
+		
 		// in case of an location_error
 		function locationError(errorType) {
 			console.log(errorType);

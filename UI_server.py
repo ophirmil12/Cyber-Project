@@ -1,9 +1,10 @@
 # imports:
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 import json
 import DB_Miller_Library as DB
 import datetime
 import Distance_Library as Distance
+import os
 
 # flask argument
 app = Flask(__name__)
@@ -213,6 +214,13 @@ def user():
     print(content)
     # checking what method need to be used
     return commend_checker(content, db)
+
+
+# the favicon route
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 # help - mainly explanation on the functions in the site
