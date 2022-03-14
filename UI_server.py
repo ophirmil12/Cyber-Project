@@ -34,7 +34,7 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
                           prisoner_personal_data[3], prisoner_red_circles]
         return json.dumps(data_to_return)
     except:
-        return "SubmitPrisonerError"
+        return "Submit Prisoner Error"
 
 
 def get_all_problems_and_new_alerts(db):
@@ -60,16 +60,22 @@ def add_or_remove_red_circle(content, db):
         add_remove_type = data[3]
         radius = data[4]
         circle_type = data[5]
+        # function - adding
         if add_remove_type == "ADD":
-            db.add_red_circle(prisoner_id, radius, lat, lng, circle_type)
-            return "AddedCircle"
+            # checking radius
+            if radius > 0:
+                db.add_red_circle(prisoner_id, radius, lat, lng, circle_type)
+                return "Added Circle"
+            else:
+                return "Radius Can`t be 0 or negative! (Error)"
+        # function - removing
         elif add_remove_type == "REMOVE":
             db.remove_red_circle(prisoner_id, lat, lng)
-            return "RemovedCircle"
+            return "Removed Circle"
         else:
-            return "NoSuchCommandError"
+            return "No Such Command! (Error)"
     except:
-        return "ValueError"
+        return "Value Error!"
 
 
 def new_prisoner(content, db):

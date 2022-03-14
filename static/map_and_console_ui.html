@@ -8,7 +8,7 @@
 			Prisoners Tracking System - Miller Production
 		</title>
 		
-		<link rel="favicon" href="{{ url_for('static', filename='favicon.ico') }}">	
+		<link rel="“" href="{{ url_for('static', filename='favicon.ico') }}">	
 		
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
@@ -78,6 +78,21 @@
 					5: status
 					6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
 					*/
+					// making the string of the circles
+					var circles_string = "";
+					for (var i = 0; i < thisPrisoner[6].length; i++) {
+						this_circle_data = thisPrisoner[6][i];
+						this_circle_data_string = this_circle_data[2].toString() + ", " + this_circle_data[3].toString() + ", " + this_circle_data[4].toString();
+						if(this_circle_data[5] == 1)
+						{
+							this_circle_data_string = this_circle_data_string + ", Not allowed inside"
+						}
+						else
+						{
+							this_circle_data_string = this_circle_data_string + ", allowed only inside"
+						}
+						circles_string = circles_string + this_circle_data_string + "</br>"
+					}	
 					// display the data of the chosen prisoner
 					document.getElementById("prisonerID").innerHTML = thisPrisoner[0];
 					document.getElementById("prisonerDate").innerHTML = thisPrisoner[4];
@@ -85,9 +100,13 @@
 					// display personal data of the prisoner
 					document.getElementById("prisonerName").innerHTML = thisPrisoner[1];
 					document.getElementById("prisonerNationalID").innerHTML = thisPrisoner[2];
-					//other things:
+					// display prisoner`s circles
+					document.getElementById("circlesData").innerHTML = circles_string;
+					// other things:
 					document.getElementById("DataTag").innerHTML = "DATA:";
 					document.getElementById("LastLocationTag").innerHTML = "LAST LOCATION:";
+					document.getElementById("CirclesTag").innerHTML = "CIRCLES:";
+					
 					// display the current location on the map
 					var myLatlng = new google.maps.LatLng(thisPrisoner[3][0], thisPrisoner[3][1]);
 					var mapOptions = {
@@ -173,13 +192,18 @@
 
 			<!-- display the chosen prisoner personal data -->
 			<p id="DataTag"></p>
+
 			<p id="prisonerName"></p>
 			<p id="prisonerNationalID"></p>
 			<p id="prisonerID"></p>
+			
 			<p id="LastLocationTag"></p>
+			
 			<p id="prisonerDate"></p>
 			<p id="prisonerLocation"></p>
-		
+			
+			<p id="CirclesTag"></p>
+			<p id="circlesData"></p>
 		</div>
 		
 
