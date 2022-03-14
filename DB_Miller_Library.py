@@ -127,4 +127,11 @@ class Database:
         cursor.execute(sql_to_execute, record)
         self.conn.commit()
 
+    # remove red circle from prisoner
+    def remove_prisoner(self, prisoner_id):
+        sql_to_execute = "DELETE FROM prisoners WHERE prisoner_id = ?;"
+        cursor = self.conn.cursor()
+        cursor.execute(sql_to_execute, (prisoner_id, ))
+        self.conn.commit()
+
     # change prisoner`s personal data?

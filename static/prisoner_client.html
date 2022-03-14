@@ -51,8 +51,6 @@
 			if (navigator.geolocation) {
 				console.log("geolocation good.");
 				navigator.geolocation.getCurrentPosition(showPosition);
-				///////the error is in the use of flask - the function above works, but only without the falsk
-				//????????????????
 			}
 			else { 
 				locationError(errorType);
@@ -61,8 +59,8 @@
 		
 		// if got a location - it sends it to the server
 		function showPosition(position) {
+			console.log("current position:");
 			console.log(position);
-			
 			var PrisonerNationalId = document.getElementById("PrisonerNationalId").value;
 			let CurrentLatitude = position.coords.latitude;
 			let CurrentLongitude = position.coords.longitude;
@@ -79,14 +77,14 @@
 		
 		// after sending the data to the server, showing the response
 		function UpdateDataToPage(NewData) {
-			document.getElementById("response").innerHTML = "Getting Locations: " + NewData;
+			document.getElementById("responseGeolocation").innerHTML = "Getting Locations: " + NewData;
 		}
 
 		</script>
 	</head>
 	
 	<body style="background: ghostwhite">
-	
+
 		<h1>Prisoner Login System</h1>
 		
 		<div>
@@ -103,7 +101,7 @@
 		
 		<button onclick='submitButton()'> Submit </button>
 		
-		<p id="response"></p>
+		<p id="responseGeolocation"></p>
 		<p id="responseNewPrisoner"></p>
 	
 	</div>

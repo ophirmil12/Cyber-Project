@@ -28,13 +28,20 @@
 			async function getAllPrisoners(allPrisonersString) {
 				var allPrisoners = JSON.parse(allPrisonersString);
 				//Create and append select list
-				var selectList = document.getElementById("mySelect");				
+				var selectList = document.getElementById("mySelect");
+				var RemovePrisonerSelectList = document.getElementById("PrisonerRemoveMySelect");				
 				//Create and append the options
 				for (var i = 0; i < allPrisoners.length; i++) {
 					var option = document.createElement("option");
 					option.value = allPrisoners[i][0];
 					option.text = allPrisoners[i][1];
 					selectList.add(option);
+				}
+				for (var i = 0; i < allPrisoners.length; i++) {
+					var option = document.createElement("option");
+					option.value = allPrisoners[i][0];
+					option.text = allPrisoners[i][1];
+					RemovePrisonerSelectList.add(option);
 				}
 			}
 			
@@ -67,7 +74,7 @@
 			}
 			
 			async function loadPrisoner(prisonerData) {
-				if (prisonerData != "SubmitPrisonerError") {
+				if (prisonerData != "Submit Prisoner Error") {
 					const thisPrisoner = JSON.parse(prisonerData);
 					/* thisPrisoner[]:
 					0: ID
@@ -140,15 +147,40 @@
 							map,
 							center: {lat: thisPrisoner[6][redCircle][3], lng: thisPrisoner[6][redCircle][4]},
 							radius: thisPrisoner[6][redCircle][2],
+							title: thisPrisoner[6][redCircle][3].toString() + ", " + thisPrisoner[6][redCircle][4].toString()
 						});
 					}
-				} else {
+				}
+				
+				else {
 					document.getElementById("DataTag").innerHTML = "Submiting Error or No Location messured yet by the prisoner. </br>Please wait few seconds and try again.";
+					document.getElementById("prisonerID").innerHTML = "";
+					document.getElementById("prisonerDate").innerHTML = "";
+					document.getElementById("prisonerLocation").innerHTML = "";
+					document.getElementById("prisonerName").innerHTML = "";
+					document.getElementById("prisonerNationalID").innerHTML = "";
+					document.getElementById("circlesData").innerHTML = "";
+					document.getElementById("LastLocationTag").innerHTML = "";
+					document.getElementById("CirclesTag").innerHTML = "";
 				}	
 			}
 			
-
+			// the removing prisoner submit buttom
+			function RemovePrisonerButtom() {
+				var inputID = document.getElementById("PrisonerRemoveMySelect").value;
+				if(inputID.toString() != ""){
+					if (confirm("Are you sure you want to remove " + inputID.toString() + "?")) {
+						talkToServer("remove_prisoner", inputID, removingPrisonerResponse);
+					}
+				}
+			}
+			
+			function removingPrisonerResponse(response) {
+				document.getElementById("responseRemoving").innerHTML = response;
+			}
+			
 		</script>
+		
 	</head>
 	
 	<body style="background: gainsboro">
@@ -166,7 +198,7 @@
 		<!-- map div --> 
 		<div class="map">
 		
-			<div id="googleMap" style="width:50%; height:90%; float:left"></div>
+			<div id="googleMap" style="width:50%; height:85%; float:left"></div>
 			
 			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWlV0cCCxdRnZ-MZoaDSrjXwwN7z_ZjjI&callback=myMap">
 			</script>
@@ -175,7 +207,7 @@
 		
 		
 		<!-- select prisoner list --> 
-		<div style="float:left; top:10%; height:60%; width:25%">
+		<div style="float:left; top:10%; height:70%; width:25%">
 
 			<h2>Select Prisoner:</h2>
 			
@@ -204,6 +236,7 @@
 			
 			<p id="CirclesTag"></p>
 			<p id="circlesData"></p>
+
 		</div>
 		
 
@@ -212,12 +245,27 @@
 			</iframe>
 		</div>
 		
-		<div style="float:right; width:25%; height:40%">
-			<iframe src="/log" title="log" style="height:75%; border: 1px solid #333">
+		<div style="float:right; width:25%; height:25%">
+			<iframe src="/log" title="log" style="height:100%; border: 1px solid #333">
 			</iframe>
 		</div>
-		</br>
-	
 		
+		</br>
+		
+		<div style="height:5%">
+		
+			<h2> Remove Prisoner </h2>
+			
+			<!-- selecting list -->
+			<select id="PrisonerRemoveMySelect">
+			</select>
+			
+			<!-- buttom submit -->
+			<button onclick='RemovePrisonerButtom()'> Submit </button>
+			
+			<p id="responseRemoving"></p>
+			
+		</div>
+	
 	</body>
 </html>

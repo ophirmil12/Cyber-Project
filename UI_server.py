@@ -63,7 +63,7 @@ def add_or_remove_red_circle(content, db):
         # function - adding
         if add_remove_type == "ADD":
             # checking radius
-            if radius > 0:
+            if int(radius) > 0:
                 db.add_red_circle(prisoner_id, radius, lat, lng, circle_type)
                 return "Added Circle"
             else:
@@ -165,6 +165,15 @@ def get_help_text(content):
         return json.dumps("TextFileProblem")
 
 
+# removing prisoner
+def remove_prisoner(content, db):
+    try:
+        db.remove_prisoner(content["input"])
+        return "Prisoner Removed Successfully"
+    except:
+        return "Prisoner Not Found"
+
+
 # the ajax calls get checked by names
 def commend_checker(content, db):
     # command type: when pressing the submit button - sending prisoner_data`s data to the UI
@@ -202,6 +211,10 @@ def commend_checker(content, db):
     # help center texts and ect.
     elif content["type"] == "get_help_text":
         return get_help_text(content)
+
+    # removing prisoner
+    elif content["type"] == "remove_prisoner":
+        return remove_prisoner(content, db)
 
     # command type: unknown
     else:
