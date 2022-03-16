@@ -23,15 +23,15 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
             6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
         """
         prisoner_id = content["input"]
-        prisoner_personal_data = db.get_prisoner_personal_data(prisoner_id)[0]
         try:
+            prisoner_personal_data = db.get_prisoner_personal_data(prisoner_id)[0]
             prisoner_location = db.get_prisoner_locations(prisoner_id)[-1]
+            prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
+            data_to_return = [prisoner_id, prisoner_personal_data[1], prisoner_personal_data[2],
+                              [prisoner_location[3], prisoner_location[4]], prisoner_location[2],
+                              prisoner_personal_data[3], prisoner_red_circles]
         except IndexError:
-            prisoner_location = [0.0, 0.0]
-        prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
-        data_to_return = [prisoner_id, prisoner_personal_data[1], prisoner_personal_data[2],
-                          [prisoner_location[3], prisoner_location[4]], prisoner_location[2],
-                          prisoner_personal_data[3], prisoner_red_circles]
+            return "No Location Measured Yet"
         return json.dumps(data_to_return)
     except:
         return "Submit Prisoner Error"
@@ -70,8 +70,11 @@ def add_or_remove_red_circle(content, db):
                 return "Radius Can`t be 0 or negative! (Error)"
         # function - removing
         elif add_remove_type == "REMOVE":
-            db.remove_red_circle(prisoner_id, lat, lng)
-            return "Removed Circle"
+            try:
+                db.remove_red_circle(prisoner_id, lat, lng)
+                return "Removed Circle"
+            except:
+                return "Data Base Error!"
         else:
             return "No Such Command! (Error)"
     except:
@@ -93,17 +96,25 @@ def new_prisoner(content, db):
 def prisoner_new_location(content, db):
     try:
         data = json.loads(content["input"])
+        # loading the data that received
         client_national_id = data[0]
         location_lat = data[1]
         location_lng = data[2]
+        # creating timestamp
         date = datetime.datetime.now()
+        # inserting the new location into the database
         db.insert_new_location(client_national_id, date, location_lat, location_lng)
+        # now, we will check if the prisoner is in unwanted place
+        # getting all the prisoner`s red circles
         all_red_circles = db.get_all_prisoner_red_circles(client_national_id)
+        # list place-holders
         radius_placer = 2
         location_placer_lat = 3
         location_placer_lng = 4
         circle_type_placer = 5
+        # the problem checker
         is_problem = 0
+        # running through all the red circles
         for red_circle in all_red_circles:
             print("in")
             if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
@@ -194,7 +205,6 @@ def commend_checker(content, db):
     # command type: adding and removing red circles (iframe command)
     elif content["type"] == "add_or_remove_red_circle":
         return add_or_remove_red_circle(content, db)
-    # TODO display the data of the red circles somewhere
 
     # command type: inserting new prisoner to DB, from `/prisoner` tab
     elif content["type"] == "new_prisoner":
