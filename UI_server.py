@@ -75,8 +75,9 @@ def get_all_problems_and_new_alerts(db):
 
             # running through all the red circles
             for red_circle in all_red_circles:
-                if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
-                                           (prisoner_last_location[prisoner_location_placer_lat], prisoner_last_location[prisoner_location_placer_lng])) <= red_circle[radius_placer]:
+                circle_position = (red_circle[location_placer_lat], red_circle[location_placer_lng])
+                prisoner_position = (prisoner_last_location[prisoner_location_placer_lat], prisoner_last_location[prisoner_location_placer_lng])
+                if Distance.coordinate_dis(circle_position, prisoner_position) <= red_circle[radius_placer]:
                     # the prisoner is in the circle
                     if red_circle[circle_type_placer] == "1":
                         # Not allowed in the circle - Problem
