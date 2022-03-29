@@ -1,2 +1,10 @@
-check1
-check1a
+Hello officer!
+To start up the system enter the "prisoner" tab on the Manu, in the prisoner`s device.
+Then, enter the "Main" tab, to track the prisoner. Make sure to wait few seconds before checking the location at the first time.
+Choose the prisoner on the list, then press "Submit".
+The prisoner`s personal ID and current location will appear on the screen.
+To add additional restricted areas to this prisoner, you may use the "add red circles" window.
+All problems and alerts about prisoners will appear in the "Alert log" window.
+On the left you can see the selected prisoner`s location in the map, and his circles.
+To erase old prisoners, you may find the erasing option un the right button corner of the map.
+For additional help you may assist the supervisor.

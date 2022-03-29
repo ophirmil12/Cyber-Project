@@ -1,2 +1,7 @@
-check3
-check3a
+Hello developer!
+To make any changes in the content of the site, you may change the HTML code in the "static" folder.
+To change the content of the help center - you ma enter the "help_center" folder.
+In any case of repeated error, you might want to take a look in the server`s computer.
+If the prisoner`s tab doesn`t mussure locations, or doesn`t ask for permition, you might want to enter "HTTPS" (secured) site. The Geolocation library works onky on secured site, to protect it`s client.
+The server built in a way that you can add more functions easlly - you only need to create new function that return the wanted data, and a option to access it from the site.
+In any other case, contact us.

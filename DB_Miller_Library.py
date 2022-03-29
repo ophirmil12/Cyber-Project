@@ -94,6 +94,15 @@ class Database:
         self.conn.commit()
         return prisoner_personal_data
 
+    # get prisoner`s personal data by national identifier
+    def get_prisoner_personal_data_by_national_identifier(self, prisoner_national_id):
+        cursor = self.conn.cursor()
+        sql_to_execute = "select * from prisoners where national_identifier = ?"
+        cursor.execute(sql_to_execute, (prisoner_national_id,))
+        prisoner_personal_data = cursor.fetchall()
+        self.conn.commit()
+        return prisoner_personal_data
+
     # get prisoner`s red circles
     def get_all_prisoner_red_circles(self, prisoner_id):
         cursor = self.conn.cursor()

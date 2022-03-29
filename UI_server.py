@@ -2,7 +2,7 @@
 from flask import Flask, request, send_from_directory
 import json
 import DB_Miller_Library as DB
-import datetime
+from _datetime import datetime, timedelta
 import Distance_Library as Distance
 import os
 
@@ -40,12 +40,71 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
 def get_all_problems_and_new_alerts(db):
     try:
         all_new_log_data = []
+        # running through all prisoners
         for prisoner_data in db.get_all_prisoners():
-            if prisoner_data[3] == 1:
-                all_new_log_data.append(list(prisoner_data))
-            elif prisoner_data[3] == 0:
-                listed_prisoner = list(prisoner_data)
-                all_new_log_data.append(listed_prisoner)
+            # now, we will check if the prisoner is in unwanted place
+
+            prisoner_id = prisoner_data[0]
+            # data place holders for time differences
+            last_location = -1
+            time_stamp_place = 2
+            # data place holders for red circles
+            radius_placer = 2
+            location_placer_lat = 3
+            location_placer_lng = 4
+            circle_type_placer = 5
+            # data place holders for prisoner`s location data
+            prisoner_location_placer_lat = 3
+            prisoner_location_placer_lng = 4
+
+            # getting all the prisoner`s red circles
+            all_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
+            prisoner_last_location = db.get_prisoner_personal_data(prisoner_id)
+
+            # getting the prisoner`s last timestamp and current timestamp
+            last_timestamp = db.get_prisoner_locations(prisoner_id)[last_location][time_stamp_place]
+            current_time = str(datetime.now())
+            time_format = '%Y-%m-%d %H:%M:%S.%f'
+            prisoner_time_delta = datetime.strptime(current_time, time_format) - datetime.strptime(last_timestamp, time_format)
+
+            # the problem checker - if bigger than 0 - problem
+            is_problem = 0
+
+            # running through all the red circles
+            for red_circle in all_red_circles:
+                if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
+                                           (prisoner_last_location[prisoner_location_placer_lat], prisoner_last_location[prisoner_location_placer_lng])) <= red_circle[radius_placer]:
+                    # the prisoner is in the circle
+                    if red_circle[circle_type_placer] == "1":
+                        # Not allowed in the circle - Problem
+                        is_problem += 1
+                    else:
+                        # allowed only in the circle - Good
+                        is_problem += 0
+                else:
+                    # the prisoner is out of the circle
+                    if red_circle[circle_type_placer] == "1":
+                        # Not allowed in the circle - Good
+                        is_problem += 0
+                    else:
+                        # allowed only in the circle - Problem
+                        is_problem += 1
+
+            # checking if the client didn't sent location for a while
+            if prisoner_time_delta > timedelta(minutes=1):
+                is_problem += 1
+            else:
+                is_problem += 0
+
+            # finally - checking the problem checker
+            if is_problem >= 1:
+                db.change_prisoner_status(prisoner_id, new_status=1)
+            else:
+                db.change_prisoner_status(prisoner_id, new_status=0)
+
+            # adding the current prisoner to the list
+            all_new_log_data.append(list(prisoner_data))
+
         return json.dumps(all_new_log_data)
     except:
         return "LogError"
@@ -101,43 +160,9 @@ def prisoner_new_location(content, db):
         location_lat = data[1]
         location_lng = data[2]
         # creating timestamp
-        date = datetime.datetime.now()
+        date = datetime.now()
         # inserting the new location into the database
         db.insert_new_location(client_national_id, date, location_lat, location_lng)
-        # now, we will check if the prisoner is in unwanted place
-        # getting all the prisoner`s red circles
-        all_red_circles = db.get_all_prisoner_red_circles(client_national_id)
-        # list place-holders
-        radius_placer = 2
-        location_placer_lat = 3
-        location_placer_lng = 4
-        circle_type_placer = 5
-        # the problem checker
-        is_problem = 0
-        # running through all the red circles
-        for red_circle in all_red_circles:
-            print("in")
-            if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
-                                       (location_lat, location_lng)) <= red_circle[radius_placer]:
-                # the prisoner is in the circle
-                if red_circle[circle_type_placer] == "1":
-                    # Not allowed in the circle - Problem
-                    is_problem += 1
-                else:
-                    # allowed only in the circle - Good
-                    is_problem += 0
-            else:
-                # the prisoner is out of the circle
-                if red_circle[circle_type_placer] == "1":
-                    # Not allowed in the circle - Good
-                    is_problem += 0
-                else:
-                    # allowed only in the circle - Problem
-                    is_problem += 1
-        if is_problem >= 1:
-            db.change_prisoner_status(client_national_id, 1)
-        else:
-            db.change_prisoner_status(client_national_id, 0)
         return "Good"
     except:
         return "LocationError"

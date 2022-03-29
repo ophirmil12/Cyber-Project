@@ -1,2 +1,4 @@
-check2
-check2a
+Hello admin!
+This system is designed specially to track prisoners who got realeased, but still needed to stay around specific places.
+However, you might find this system uselful for tracking suspected of pedophilia, violent husbands, people who convicted sexually asullting acts, realeased rapists and ect.
+Apart from the enforcement system, the electronic handcuff will also be able to be used to monitor people with these and other mental problems that require close monitoring, as well as Alzheimer's patients and other disabilities.
