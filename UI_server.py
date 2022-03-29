@@ -9,6 +9,9 @@ import os
 # flask argument
 app = Flask(__name__)
 
+# constants
+MINUTES_GAP_CHECK = 1
+
 
 def get_prisoner_data_and_current_location_and_red_circles(content, db):
     try:
@@ -91,7 +94,7 @@ def get_all_problems_and_new_alerts(db):
                         is_problem += 1
 
             # checking if the client didn't sent location for a while
-            if prisoner_time_delta > timedelta(minutes=1):
+            if prisoner_time_delta > timedelta(minutes=MINUTES_GAP_CHECK):
                 is_problem += 1
             else:
                 is_problem += 0
