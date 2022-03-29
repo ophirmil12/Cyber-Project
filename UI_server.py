@@ -41,6 +41,17 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
 
 
 def get_all_problems_and_new_alerts(db):
+    # data place holders for time differences
+    last_location = -1
+    time_stamp_place = 2
+    # data place holders for red circles
+    radius_placer = 2
+    location_placer_lat = 3
+    location_placer_lng = 4
+    circle_type_placer = 5
+    # data place holders for prisoner`s location data
+    prisoner_location_placer_lat = 3
+    prisoner_location_placer_lng = 4
     try:
         all_new_log_data = []
         # running through all prisoners
@@ -48,17 +59,6 @@ def get_all_problems_and_new_alerts(db):
             # now, we will check if the prisoner is in unwanted place
 
             prisoner_id = prisoner_data[0]
-            # data place holders for time differences
-            last_location = -1
-            time_stamp_place = 2
-            # data place holders for red circles
-            radius_placer = 2
-            location_placer_lat = 3
-            location_placer_lng = 4
-            circle_type_placer = 5
-            # data place holders for prisoner`s location data
-            prisoner_location_placer_lat = 3
-            prisoner_location_placer_lng = 4
 
             # getting all the prisoner`s red circles
             all_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
