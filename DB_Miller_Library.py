@@ -1,5 +1,6 @@
 import sqlite3
 from random import randint
+from datetime import datetime
 
 
 # table for each prisoner
@@ -57,7 +58,9 @@ class Database:
     def insert_new_location(self, location):
         sql_to_execute = "INSERT INTO location(prisoner_id, date, lat, lng) VALUES(?,?,?,?)"
         cursor = self.conn.cursor()
-        record = (location.get_prisoner_id(), location.get_date(), location.get_lat(), location.get_lng())
+        time_format = '%Y-%m-%d %H:%M:%S.%f'
+        record = (location.get_prisoner_id(), location.get_date().strftime(time_format), location.get_lat(), location.get_lng())
+        print(record)
         cursor.execute(sql_to_execute, record)
         self.conn.commit()
 
@@ -75,6 +78,7 @@ class Database:
         sql_to_execute = "select * from location where prisoner_id = ?"
         cursor.execute(sql_to_execute, (prisoner_id,))
         locations_list = cursor.fetchall()
+        print(locations_list, prisoner_id)
         self.conn.commit()
         to_return = []
         for location in locations_list:
@@ -93,25 +97,10 @@ class Database:
 
     # get prisoner last location by prisoner_id
     def get_prisoner_last_location(self, prisoner_id):
-        cursor = self.conn.cursor()
-        sql_to_execute = "select * from location where prisoner_id = ?"
-        cursor.execute(sql_to_execute, (prisoner_id,))
-        locations_list = cursor.fetchall()
-        self.conn.commit()
+        locations_list = self.get_prisoner_locations(prisoner_id)
         if len(locations_list) > 0:
             location = locations_list[-1]
-            """
-            location:
-            0 - location_id
-            1 - prisoner_id
-            2 - date
-            3 - latitude
-            4 - longitude
-            """
-            ready_location = Location(location_id=location[0], prisoner_id=location[1], date=location[2],
-                                      lat=location[3],
-                                      lng=location[4])
-            return ready_location
+            return location
         else:
             return None
 
@@ -164,7 +153,7 @@ class Database:
         cursor = self.conn.cursor()
         sql_to_execute = "select * from prisoners where national_identifier = ?"
         cursor.execute(sql_to_execute, (prisoner_national_id,))
-        prisoner_data = cursor.fetchall()
+        prisoner_data_exist = cursor.fetchall()
         self.conn.commit()
         """
         prisoner:
@@ -173,9 +162,14 @@ class Database:
         2 - national_identifier
         3 - prisoner_status
         """
-        prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1], national_identifier=prisoner_data[2],
-                            prisoner_status=prisoner_data[3])
-        return prisoner
+        if len(prisoner_data_exist) > 0:
+            prisoner_data = prisoner_data_exist[0]
+            prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1],
+                                national_identifier=prisoner_data[2],
+                                prisoner_status=prisoner_data[3])
+            return prisoner
+        else:
+            return None
 
     # get prisoner`s red circles
     def get_all_prisoner_red_circles(self, prisoner_id):
@@ -315,14 +309,12 @@ class RedCircle:
                   self.__lat, self.__lng, self.__circle_type]
         return circle
 
-    # TODO set-s
-
 
 class Location:
 
     def __init__(self, location_id, prisoner_id, date, lat, lng):
         self.__location_id = location_id
-        self.__prisoner_id = prisoner_id
+        self.__prisoner_id = int(prisoner_id)
         self.__date = date
         self.__lat = lat
         self.__lng = lng
@@ -342,14 +334,12 @@ class Location:
     def get_lng(self):
         return self.__lng
 
-    # TODO set-s
-
 
 class Prisoner:
     def __init__(self, prisoner_id, name, national_identifier, prisoner_status):
-        self.__prisoner_id = prisoner_id
+        self.__prisoner_id = int(prisoner_id)
         self.__name = name
-        self.__national_identifier = national_identifier
+        self.__national_identifier = int(national_identifier)
         self.__prisoner_status = prisoner_status
 
     def get_prisoner_id(self):
@@ -368,5 +358,3 @@ class Prisoner:
         prisoner = [self.__prisoner_id, self.__name,
                     self.__national_identifier, self.__prisoner_status]
         return prisoner
-
-    # TODO set-s

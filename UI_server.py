@@ -26,31 +26,29 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
             5: status
             6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
         """
-        prisoner_id = content["input"]
-        try:
-            # getting the required from the database
-            prisoner_data = db.get_prisoner_personal_data(prisoner_id)
-            prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
-            prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
-            # checking that all the data exist
-            if prisoner_last_location is not None and prisoner_data is not None and prisoner_red_circles is not None:
-                prisoner_red_circles_ready = []
-                # assembling the data to sending
-                for circle in prisoner_red_circles:
-                    prisoner_red_circles_ready.append(circle.get_circle_listed())
-                data_to_return = [prisoner_id, prisoner_data.get_name(), prisoner_data.get_national_identifier(),
-                                  [prisoner_last_location.get_lat(), prisoner_last_location.get_lng()],
-                                  prisoner_last_location.get_date(), prisoner_data.get_status(),
-                                  prisoner_red_circles_ready]
-                # sending the data
-                return json.dumps(data_to_return)
-            else:
-                return "No prisoner in the system"
-
-        except IndexError:
+        prisoner_id = int(content["input"])
+        # getting the required from the database
+        prisoner_data = db.get_prisoner_personal_data(prisoner_id)
+        prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
+        prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
+        # checking that all the data exist
+        if prisoner_last_location is not None and prisoner_data is not None:
+            prisoner_red_circles_ready = []
+            # assembling the data to sending
+            for circle in prisoner_red_circles:
+                prisoner_red_circles_ready.append(circle.get_circle_listed())
+            data_to_return = [prisoner_id, prisoner_data.get_name(), prisoner_data.get_national_identifier(),
+                              [prisoner_last_location.get_lat(), prisoner_last_location.get_lng()],
+                              prisoner_last_location.get_date(), prisoner_data.get_status(),
+                              prisoner_red_circles_ready]
+            # sending the data
+            return json.dumps(data_to_return)
+        elif prisoner_data is not None and prisoner_last_location is None:
             return "No Location Measured Yet"
+        else:
+            return "No prisoner in the system"
+
     except:
-        # TODO i got error "submit error", why?
         return "Submit Prisoner Error"
 
 
@@ -84,7 +82,6 @@ def get_all_problems_and_new_alerts(db):
             # getting all the prisoner`s red circles
             all_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
             prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
-            # TODO prisoner_last_location might be None (no location measured yet)
 
             if prisoner_last_location is not None and all_red_circles is not None:
                 # getting the prisoner`s last timestamp and current timestamp
@@ -155,7 +152,9 @@ def add_or_remove_red_circle(content, db):
         """
         # opening data and creating RedCircle
         add_remove_type = data[3]
-        red_circle_data = DB.RedCircle(None, prisoner_id=data[0], radius=data[4], lat=data[1], lng=data[2],
+        red_circle_data = DB.RedCircle(None,
+                                       prisoner_id=db.get_prisoner_personal_data_by_national_identifier(data[0]).get_prisoner_id(),
+                                       radius=data[4], lat=data[1], lng=data[2],
                                        circle_type=data[5])
 
         # function - adding
@@ -191,7 +190,8 @@ def new_prisoner(content, db):
         1 - name
         """
         # todo national identifier change
-        prisoner_data = DB.Prisoner(prisoner_id=db.get_new_id(), name=data[1], national_identifier=data[0], prisoner_status=False)
+        prisoner_data = DB.Prisoner(prisoner_id=db.get_new_id(), name=data[1], national_identifier=data[0],
+                                    prisoner_status=False)
         # inserting the new prisoner into the server
         db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
@@ -211,15 +211,17 @@ def prisoner_new_location(content, db):
         # creating timestamp
         date = datetime.now()
         # loading the data that received
-        prisoner_id = data[0]
+        prisoner_national_identifier = data[0]
+        prisoner_id = db.get_prisoner_personal_data_by_national_identifier(
+            prisoner_national_identifier).get_prisoner_id()
         check = 0
         all_prisoners = db.get_all_prisoners()
         for prisoner_check in all_prisoners:
             # that means that the prisoner still exist
-            if prisoner_check.get_prisoner_id() == int(prisoner_id):
+            if int(prisoner_check.get_prisoner_id()) == int(prisoner_id):
                 check += 1
         if check == 1:
-            location_data = DB.Location(location_id=None, prisoner_id=data[0], date=date, lat=data[1], lng=data[2])
+            location_data = DB.Location(location_id=None, prisoner_id=prisoner_id, date=date, lat=data[1], lng=data[2])
             # inserting the new location into the database
             db.insert_new_location(location_data)
             return "Good"
