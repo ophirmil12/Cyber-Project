@@ -1,6 +1,5 @@
 import sqlite3
 from random import randint
-from datetime import datetime
 
 
 # table for each prisoner
