@@ -40,7 +40,8 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
                     prisoner_red_circles_ready.append(circle.get_circle_listed())
                 data_to_return = [prisoner_id, prisoner_data.get_name(), prisoner_data.get_national_identifier(),
                                   [prisoner_last_location.get_lat(), prisoner_last_location.get_lng()],
-                                  prisoner_last_location.get_date(), prisoner_data.get_status(), prisoner_red_circles_ready]
+                                  prisoner_last_location.get_date(), prisoner_data.get_status(),
+                                  prisoner_red_circles_ready]
                 # sending the data
                 return json.dumps(data_to_return)
             else:
@@ -161,15 +162,17 @@ def add_or_remove_red_circle(content, db):
         if add_remove_type == "ADD":
             # checking radius
             if int(red_circle_data.get_radius()) > 0:
-                db.add_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_radius(), red_circle_data.get_lat(),
-                                  red_circle_data.get_lng(), red_circle_data.get_circle_type())
+                db.add_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_radius(),
+                                  red_circle_data.get_lat(), red_circle_data.get_lng(),
+                                  red_circle_data.get_circle_type())
                 return "Added Circle"
             else:
                 return "Radius Can`t be 0 or negative! (Error)"
         # function - removing
         elif add_remove_type == "REMOVE":
             try:
-                db.remove_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_lat(), red_circle_data.get_lng())
+                db.remove_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_lat(),
+                                     red_circle_data.get_lng())
                 return "Removed Circle"
             except:
                 return "Data Base Error!"
