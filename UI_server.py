@@ -11,6 +11,7 @@ app = Flask(__name__)
 
 # constants
 MINUTES_GAP_CHECK = 1
+LOCAL_HOST = '0.0.0.0'
 
 
 def get_prisoner_data_and_current_location_and_red_circles(content, db):
@@ -80,7 +81,7 @@ def get_all_problems_and_new_alerts(db):
             prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
             # TODO prisoner_last_location might be None (no location measured yet)
 
-            if prisoner_last_location is not None:
+            if prisoner_last_location is not None and all_red_circles is not None:
                 # getting the prisoner`s last timestamp and current timestamp
                 last_timestamp = prisoner_last_location.get_date()
                 current_time = str(datetime.now())
@@ -139,24 +140,33 @@ def add_or_remove_red_circle(content, db):
     #try:
     if True:
         data = json.loads(content["input"])
+        """
+        data:
+        0 - prisoner_id
+        1 - latitude
+        2 - longitude
+        3 - add/remove circle
+        4 - radius
+        5 - circle_type
+        """
         # opening data and creating RedCircle
         add_remove_type = data[3]
-        prisoner_data = DB.RedCircle(None, prisoner_id=data[0], radius=data[4], lat=data[1], lng=data[2],
-                                     circle_type=data[5])
+        red_circle_data = DB.RedCircle(None, prisoner_id=data[0], radius=data[4], lat=data[1], lng=data[2],
+                                       circle_type=data[5])
 
         # function - adding
         if add_remove_type == "ADD":
             # checking radius
-            if int(prisoner_data.get_radius()) > 0:
-                db.add_red_circle(prisoner_data.get_prisoner_id(), prisoner_data.get_radius(), prisoner_data.get_lat(),
-                                  prisoner_data.get_lng(), prisoner_data.get_circle_type())
+            if int(red_circle_data.get_radius()) > 0:
+                db.add_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_radius(), red_circle_data.get_lat(),
+                                  red_circle_data.get_lng(), red_circle_data.get_circle_type())
                 return "Added Circle"
             else:
                 return "Radius Can`t be 0 or negative! (Error)"
         # function - removing
         elif add_remove_type == "REMOVE":
             try:
-                db.remove_red_circle(prisoner_data.get_prisoner_id(), prisoner_data.get_lat(), prisoner_data.get_lng())
+                db.remove_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_lat(), red_circle_data.get_lng())
                 return "Removed Circle"
             except:
                 return "Data Base Error!"
@@ -170,7 +180,12 @@ def new_prisoner(content, db):
     #try:
     if True:
         data = json.loads(content["input"])
-        prisoner_data = DB.Prisoner(data[0], data[1], data[0], False)
+        """
+        data:
+        0 - prisoner_id
+        1 - name
+        """
+        prisoner_data = DB.Prisoner(prisoner_id=data[0], name=data[1], national_identifier=data[0], prisoner_status=False)
         db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
     #except:
@@ -181,11 +196,16 @@ def prisoner_new_location(content, db):
     #try:
     if True:
         data = json.loads(content["input"])
+        """
+        data:
+        0 - prisoner_id
+        1 - latitude
+        2 - longitude
+        """
         # creating timestamp
         date = datetime.now()
         # loading the data that received
-        location_data = DB.Location(None, data[0], date, data[1], data[2])
-
+        location_data = DB.Location(location_id=None, prisoner_id=data[0], date=date, lat=data[1], lng=data[2])
         # inserting the new location into the database
         db.insert_new_location(location_data)
         return "Good"
@@ -339,4 +359,4 @@ def main_page_directing():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host=LOCAL_HOST, debug=True)

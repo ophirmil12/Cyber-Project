@@ -77,6 +77,14 @@ class Database:
         self.conn.commit()
         to_return = []
         for location in locations_list:
+            """
+            location:
+            0 - location_id
+            1 - prisoner_id
+            2 - date
+            3 - latitude
+            4 - longitude
+            """
             ready_location = Location(location_id=location[0], prisoner_id=location[1], date=location[2],
                                       lat=location[3], lng=location[4])
             to_return.append(ready_location)
@@ -91,6 +99,14 @@ class Database:
         self.conn.commit()
         if len(locations_list) > 0:
             location = locations_list[-1]
+            """
+            location:
+            0 - location_id
+            1 - prisoner_id
+            2 - date
+            3 - latitude
+            4 - longitude
+            """
             ready_location = Location(location_id=location[0], prisoner_id=location[1], date=location[2],
                                       lat=location[3],
                                       lng=location[4])
@@ -107,6 +123,13 @@ class Database:
         self.conn.commit()
         to_return = []
         for p in prisoners_list:
+            """
+            prisoner:
+            0 - prisoner_id
+            1 - name
+            2 - national_identifier
+            3 - prisoner_status
+            """
             prisoner = Prisoner(prisoner_id=p[0], name=p[1], national_identifier=p[2],
                                 prisoner_status=p[3])
             to_return.append(prisoner)
@@ -121,6 +144,13 @@ class Database:
         self.conn.commit()
         if len(prisoner_data_exist) > 0:
             prisoner_data = prisoner_data_exist[0]
+            """
+            prisoner:
+            0 - prisoner_id
+            1 - name
+            2 - national_identifier
+            3 - prisoner_status
+            """
             prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1], national_identifier=prisoner_data[2],
                                 prisoner_status=prisoner_data[3])
             return prisoner
@@ -134,6 +164,13 @@ class Database:
         cursor.execute(sql_to_execute, (prisoner_national_id,))
         prisoner_data = cursor.fetchall()
         self.conn.commit()
+        """
+        prisoner:
+        0 - prisoner_id
+        1 - name
+        2 - national_identifier
+        3 - prisoner_status
+        """
         prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1], national_identifier=prisoner_data[2],
                             prisoner_status=prisoner_data[3])
         return prisoner
@@ -147,6 +184,15 @@ class Database:
         self.conn.commit()
         to_return = []
         for c in prisoner_red_circles:
+            """
+            circle:
+            0 - circle_id
+            1 - prisoner_id
+            2 - radius
+            3 - latitude
+            4 - longitude
+            5 - circle_type
+            """
             circle = RedCircle(circle_id=c[0], prisoner_id=c[1], radius=c[2], lat=c[3], lng=c[4], circle_type=c[5])
             to_return.append(circle)
         return to_return
@@ -206,18 +252,23 @@ class Database:
 
     # change sequence counter
     def sequence_counter_change(self, line, change_by):
-        # gets the current number
-        cursor = self.conn.cursor()
-        sql_to_execute = "select * from sqlite_sequence WHERE name = ?"
-        cursor.execute(sql_to_execute, (line,))
-        current_status = cursor.fetchall()[0]
-        self.conn.commit()
+        try:
+            # gets the current number
+            cursor = self.conn.cursor()
+            sql_to_execute = "select * from sqlite_sequence WHERE name = ?"
+            cursor.execute(sql_to_execute, (line,))
+            # the 0 - the data comes in a list of one tuple, if the list is empty (no sequence table exist)
+            # that means the UI had`t opened once
+            current_status = cursor.fetchall()[0]
+            self.conn.commit()
 
-        # change the number
-        sql_to_execute_2 = "UPDATE sqlite_sequence SET seq = ? WHERE name = ?;"
-        record_2 = (int(current_status[1]) + change_by, line)
-        cursor.execute(sql_to_execute_2, record_2)
-        self.conn.commit()
+            # change the number
+            sql_to_execute_2 = "UPDATE sqlite_sequence SET seq = ? WHERE name = ?;"
+            record_2 = (int(current_status[1]) + change_by, line)
+            cursor.execute(sql_to_execute_2, record_2)
+            self.conn.commit()
+        except:
+            pass
 
 
 class RedCircle:
