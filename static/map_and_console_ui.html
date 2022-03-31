@@ -74,7 +74,7 @@
 			}
 			
 			async function loadPrisoner(prisonerData) {
-				if (prisonerData != "Submit Prisoner Error" & prisonerData != "No Location Measured Yet") {
+				if (prisonerData != "Submit Prisoner Error" & prisonerData != "No Location Measured Yet" & prisonerData != "No prisoner in the system") {
 					const thisPrisoner = JSON.parse(prisonerData);
 					/* thisPrisoner[]:
 					0: ID

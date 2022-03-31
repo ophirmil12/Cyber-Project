@@ -1,4 +1,5 @@
 import sqlite3
+from random import randint
 
 
 # table for each prisoner
@@ -270,6 +271,16 @@ class Database:
             self.conn.commit()
         except:
             pass
+
+    # creating new id for new prisoner
+    def get_new_id(self):
+        random_id = randint(10000000, 99999999)
+        for current_prisoner in self.get_all_prisoners():
+            if current_prisoner.get_prisoner_id() == random_id:
+                return self.get_new_id()
+            else:
+                pass
+        return random_id
 
 
 class RedCircle:

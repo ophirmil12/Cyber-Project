@@ -190,7 +190,8 @@ def new_prisoner(content, db):
         0 - prisoner_id
         1 - name
         """
-        prisoner_data = DB.Prisoner(prisoner_id=data[0], name=data[1], national_identifier=data[0], prisoner_status=False)
+        # todo national identifier change
+        prisoner_data = DB.Prisoner(prisoner_id=db.get_new_id(), name=data[1], national_identifier=data[0], prisoner_status=False)
         # inserting the new prisoner into the server
         db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
