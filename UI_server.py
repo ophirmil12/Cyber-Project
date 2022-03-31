@@ -10,7 +10,7 @@ import os
 app = Flask(__name__)
 
 # constants
-MINUTES_GAP_CHECK = 1
+LOCATIONS_MINUTES_GAP_CHECK = 1
 LOCAL_HOST = '0.0.0.0'
 
 
@@ -30,16 +30,20 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
         prisoner_id = content["input"]
         #try:
         if True:
+            # getting the required from the database
             prisoner_data = db.get_prisoner_personal_data(prisoner_id)
             prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
             prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
+            # checking that all the data exist
             if prisoner_last_location is not None and prisoner_data is not None and prisoner_red_circles is not None:
                 prisoner_red_circles_ready = []
+                # assembling the data to sending
                 for circle in prisoner_red_circles:
                     prisoner_red_circles_ready.append(circle.get_circle_listed())
                 data_to_return = [prisoner_id, prisoner_data.get_name(), prisoner_data.get_national_identifier(),
                                   [prisoner_last_location.get_lat(), prisoner_last_location.get_lng()],
                                   prisoner_last_location.get_date(), prisoner_data.get_status(), prisoner_red_circles_ready]
+                # sending the data
                 return json.dumps(data_to_return)
             else:
                 return "No prisoner in the system"
@@ -55,17 +59,21 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
 def get_all_prisoners(db):
     #try:
     if True:
+        # getting all the prisoners from the database
         prisoners_data = db.get_all_prisoners()
         ret_list = []
+        # assembling the list of prisoners in pure data, not Prisoner variable
         for prisoner_ret in prisoners_data:
             listed_prisoner = [prisoner_ret.get_prisoner_id(), prisoner_ret.get_name(),
                                prisoner_ret.get_national_identifier(), prisoner_ret.get_status()]
             ret_list.append(listed_prisoner)
+        # sending the data
         return json.dumps(ret_list)
     #except:
         return "LoadingAllPrisonersForListError"
 
 
+# HERE HAPPENS ALL THE MAGIC!
 def get_all_problems_and_new_alerts(db):
     #try:
     if True:
@@ -114,7 +122,7 @@ def get_all_problems_and_new_alerts(db):
                             is_problem += 1
 
                 # checking if the client didn't sent location for a while
-                if prisoner_time_delta > timedelta(minutes=MINUTES_GAP_CHECK):
+                if prisoner_time_delta > timedelta(minutes=LOCATIONS_MINUTES_GAP_CHECK):
                     is_problem += 1
                 else:
                     is_problem += 0
@@ -186,6 +194,7 @@ def new_prisoner(content, db):
         1 - name
         """
         prisoner_data = DB.Prisoner(prisoner_id=data[0], name=data[1], national_identifier=data[0], prisoner_status=False)
+        # inserting the new prisoner into the server
         db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
     #except:
@@ -205,10 +214,20 @@ def prisoner_new_location(content, db):
         # creating timestamp
         date = datetime.now()
         # loading the data that received
-        location_data = DB.Location(location_id=None, prisoner_id=data[0], date=date, lat=data[1], lng=data[2])
-        # inserting the new location into the database
-        db.insert_new_location(location_data)
-        return "Good"
+        prisoner_id = data[0]
+        check = 0
+        all_prisoners = db.get_all_prisoners()
+        for prisoner_check in all_prisoners:
+            # that means that the prisoner still exist
+            if prisoner_check.get_prisoner_id() == int(prisoner_id):
+                check += 1
+        if check == 1:
+            location_data = DB.Location(location_id=None, prisoner_id=data[0], date=date, lat=data[1], lng=data[2])
+            # inserting the new location into the database
+            db.insert_new_location(location_data)
+            return "Good"
+        else:
+            return "The prisoner deleted"
     #except:
         return "LocationError"
 
@@ -217,6 +236,8 @@ def prisoner_unknown_location(content, db):
     prisoner_id = json.loads(content["input"])
     #try:
     if True:
+        # the prisoner status changes to "problem" when the location is unknown -
+        # mostly to alert the police officers that the prisoner isn`t connected
         db.change_prisoner_status(prisoner_id, new_status=1)
         return "GettingPrisonerLocationError"
     #except:
@@ -224,7 +245,7 @@ def prisoner_unknown_location(content, db):
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
 
-# in use in get_help_text
+# in use in get_help_text function
 def get_text_from_file(file_name):
     text = open(f"help_center\\" + file_name, "r").read()
     return json.dumps(text)
@@ -234,6 +255,7 @@ def get_help_text(content):
     help_type = content["input"]
     #try:
     if True:
+        # returns the text of the file which requested
         if help_type == "for_users":
             return get_text_from_file("help_for_users.txt")
         elif help_type == "for_admins":
