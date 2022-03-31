@@ -15,8 +15,7 @@ LOCAL_HOST = '0.0.0.0'
 
 
 def get_prisoner_data_and_current_location_and_red_circles(content, db):
-    #try:
-    if True:
+    try:
         """
         data_to_return:
             0: ID
@@ -28,8 +27,7 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
             6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
         """
         prisoner_id = content["input"]
-        #try:
-        if True:
+        try:
             # getting the required from the database
             prisoner_data = db.get_prisoner_personal_data(prisoner_id)
             prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
@@ -48,17 +46,16 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
             else:
                 return "No prisoner in the system"
 
-        #except IndexError:
+        except IndexError:
             return "No Location Measured Yet"
-    #except:
+    except:
         # TODO i got error "submit error", why?
         return "Submit Prisoner Error"
 
 
 # return list of all prisoners
 def get_all_prisoners(db):
-    #try:
-    if True:
+    try:
         # getting all the prisoners from the database
         prisoners_data = db.get_all_prisoners()
         ret_list = []
@@ -69,14 +66,13 @@ def get_all_prisoners(db):
             ret_list.append(listed_prisoner)
         # sending the data
         return json.dumps(ret_list)
-    #except:
+    except:
         return "LoadingAllPrisonersForListError"
 
 
 # HERE HAPPENS ALL THE MAGIC!
 def get_all_problems_and_new_alerts(db):
-    #try:
-    if True:
+    try:
         all_new_log_data = []
         # running through all prisoners
         for prisoner_data in db.get_all_prisoners():
@@ -140,13 +136,12 @@ def get_all_problems_and_new_alerts(db):
                 all_new_log_data.append(prisoner_data.get_prisoner_listed())
 
         return json.dumps(all_new_log_data)
-    #except:
+    except:
         return "LogError"
 
 
 def add_or_remove_red_circle(content, db):
-    #try:
-    if True:
+    try:
         data = json.loads(content["input"])
         """
         data:
@@ -180,13 +175,12 @@ def add_or_remove_red_circle(content, db):
                 return "Data Base Error!"
         else:
             return "No Such Command! (Error)"
-    #except:
+    except:
         return "Value Error!"
 
 
 def new_prisoner(content, db):
-    #try:
-    if True:
+    try:
         data = json.loads(content["input"])
         """
         data:
@@ -197,13 +191,12 @@ def new_prisoner(content, db):
         # inserting the new prisoner into the server
         db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
-    #except:
+    except:
         return "ValueError"
 
 
 def prisoner_new_location(content, db):
-    #try:
-    if True:
+    try:
         data = json.loads(content["input"])
         """
         data:
@@ -228,19 +221,18 @@ def prisoner_new_location(content, db):
             return "Good"
         else:
             return "The prisoner deleted"
-    #except:
+    except:
         return "LocationError"
 
 
 def prisoner_unknown_location(content, db):
     prisoner_id = json.loads(content["input"])
-    #try:
-    if True:
+    try:
         # the prisoner status changes to "problem" when the location is unknown -
         # mostly to alert the police officers that the prisoner isn`t connected
         db.change_prisoner_status(prisoner_id, new_status=1)
         return "GettingPrisonerLocationError"
-    #except:
+    except:
         print("Inner error. please call the code manager")
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
@@ -253,8 +245,7 @@ def get_text_from_file(file_name):
 
 def get_help_text(content):
     help_type = content["input"]
-    #try:
-    if True:
+    try:
         # returns the text of the file which requested
         if help_type == "for_users":
             return get_text_from_file("help_for_users.txt")
@@ -266,17 +257,16 @@ def get_help_text(content):
             return get_text_from_file("common_f_and_q.txt")
         else:
             return json.dumps("CommandNotFound")
-    #except:
+    except:
         return json.dumps("TextFileProblem")
 
 
 # removing prisoner
 def remove_prisoner(content, db):
-    #try:
-    if True:
+    try:
         db.remove_prisoner(content["input"])
         return "Prisoner Removed Successfully"
-    #except:
+    except:
         return "Prisoner Not Found"
 
 
