@@ -151,7 +151,8 @@ class Database:
             2 - national_identifier
             3 - prisoner_status
             """
-            prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1], national_identifier=prisoner_data[2],
+            prisoner = Prisoner(prisoner_id=prisoner_data[0], name=prisoner_data[1],
+                                national_identifier=prisoner_data[2],
                                 prisoner_status=prisoner_data[3])
             return prisoner
         else:
