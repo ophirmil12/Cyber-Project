@@ -60,8 +60,7 @@ def get_all_prisoners(db):
         ret_list = []
         # assembling the list of prisoners in pure data, not Prisoner variable
         for prisoner_ret in prisoners_data:
-            listed_prisoner = [prisoner_ret.get_prisoner_id(), prisoner_ret.get_name(),
-                               prisoner_ret.get_national_identifier(), prisoner_ret.get_status()]
+            listed_prisoner = prisoner_ret.get_prisoner_listed()
             ret_list.append(listed_prisoner)
         # sending the data
         return json.dumps(ret_list)
@@ -130,6 +129,7 @@ def get_all_problems_and_new_alerts(db):
                 all_new_log_data.append(prisoner_data.get_prisoner_listed())
 
             else:
+                # in case that no location measured yet
                 db.change_prisoner_status(prisoner_id, new_status=1)
                 all_new_log_data.append(prisoner_data.get_prisoner_listed())
 

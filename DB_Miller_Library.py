@@ -277,6 +277,7 @@ class Database:
 
 
 class RedCircle:
+
     def __init__(self, circle_id, prisoner_id, radius, lat, lng, circle_type):
         self.__circle_id = circle_id
         self.__prisoner_id = prisoner_id
@@ -335,6 +336,7 @@ class Location:
 
 
 class Prisoner:
+
     def __init__(self, prisoner_id, name, national_identifier, prisoner_status):
         self.__prisoner_id = int(prisoner_id)
         self.__name = name
