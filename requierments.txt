@@ -1,0 +1,6 @@
+requirements:
+ * Python 3.5 or above
+ * Flask-python library installed
+ * ngrok app and ngrok acount
+ * Google Maps API key
+ 
