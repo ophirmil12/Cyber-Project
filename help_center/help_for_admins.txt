@@ -1,2 +1,4 @@
-check2
-check2a
+Hello admin!
+This system is designed specially to track prisoners who got released, but still needed to stay around specific places.
+However, you might find this system useful for tracking suspected of pedophilia, violent husbands, people who convicted sexually assaulting acts, released rapists and etc.
+Apart from the enforcement system, the electronic handcuff will also be able to be used to monitor people with these and other mental problems that require close monitoring, as well as Alzheimer's patients and other disabilities.

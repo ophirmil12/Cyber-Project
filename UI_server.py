@@ -2,12 +2,16 @@
 from flask import Flask, request, send_from_directory
 import json
 import DB_Miller_Library as DB
-import datetime
+from _datetime import datetime, timedelta
 import Distance_Library as Distance
 import os
 
 # flask argument
 app = Flask(__name__)
+
+# constants
+LOCATIONS_MINUTES_GAP_CHECK = 1
+LOCAL_HOST = '0.0.0.0'
 
 
 def get_prisoner_data_and_current_location_and_red_circles(content, db):
@@ -22,30 +26,113 @@ def get_prisoner_data_and_current_location_and_red_circles(content, db):
             5: status
             6: red_circles[[circle_id, prisoner_id, radius, lat, lng, type], [], []...]
         """
-        prisoner_id = content["input"]
-        prisoner_personal_data = db.get_prisoner_personal_data(prisoner_id)[0]
-        try:
-            prisoner_location = db.get_prisoner_locations(prisoner_id)[-1]
-        except IndexError:
-            prisoner_location = [0.0, 0.0]
+        prisoner_id = int(content["input"])
+        # getting the required from the database
+        prisoner_data = db.get_prisoner_personal_data(prisoner_id)
+        prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
         prisoner_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
-        data_to_return = [prisoner_id, prisoner_personal_data[1], prisoner_personal_data[2],
-                          [prisoner_location[3], prisoner_location[4]], prisoner_location[2],
-                          prisoner_personal_data[3], prisoner_red_circles]
-        return json.dumps(data_to_return)
+        # checking that all the data exist
+        if prisoner_last_location is not None and prisoner_data is not None:
+            prisoner_red_circles_ready = []
+            # assembling the data to sending
+            for circle in prisoner_red_circles:
+                prisoner_red_circles_ready.append(circle.get_circle_listed())
+            data_to_return = [prisoner_id, prisoner_data.get_name(), prisoner_data.get_national_identifier(),
+                              [prisoner_last_location.get_lat(), prisoner_last_location.get_lng()],
+                              prisoner_last_location.get_date(), prisoner_data.get_status(),
+                              prisoner_red_circles_ready]
+            # sending the data
+            return json.dumps(data_to_return)
+        elif prisoner_data is not None and prisoner_last_location is None:
+            return "No Location Measured Yet"
+        else:
+            return "No prisoner in the system"
+
     except:
         return "Submit Prisoner Error"
 
 
+# return list of all prisoners
+def get_all_prisoners(db):
+    try:
+        # getting all the prisoners from the database
+        prisoners_data = db.get_all_prisoners()
+        ret_list = []
+        # assembling the list of prisoners in pure data, not Prisoner variable
+        for prisoner_ret in prisoners_data:
+            listed_prisoner = prisoner_ret.get_prisoner_listed()
+            ret_list.append(listed_prisoner)
+        # sending the data
+        return json.dumps(ret_list)
+    except:
+        return "LoadingAllPrisonersForListError"
+
+
+# HERE HAPPENS ALL THE MAGIC!
 def get_all_problems_and_new_alerts(db):
     try:
         all_new_log_data = []
+        # running through all prisoners
         for prisoner_data in db.get_all_prisoners():
-            if prisoner_data[3] == 1:
-                all_new_log_data.append(list(prisoner_data))
-            elif prisoner_data[3] == 0:
-                listed_prisoner = list(prisoner_data)
-                all_new_log_data.append(listed_prisoner)
+            # now, we will check if the prisoner is in unwanted place
+
+            prisoner_id = prisoner_data.get_prisoner_id()
+
+            # getting all the prisoner`s red circles
+            all_red_circles = db.get_all_prisoner_red_circles(prisoner_id)
+            prisoner_last_location = db.get_prisoner_last_location(prisoner_id)
+
+            if prisoner_last_location is not None and all_red_circles is not None:
+                # getting the prisoner`s last timestamp and current timestamp
+                last_timestamp = prisoner_last_location.get_date()
+                current_time = str(datetime.now())
+                time_format = '%Y-%m-%d %H:%M:%S.%f'
+                prisoner_time_delta = datetime.strptime(current_time, time_format) - datetime.strptime(last_timestamp,
+                                                                                                       time_format)
+
+                # the problem checker - if bigger than 0 - problem
+                is_problem = 0
+
+                # running through all the red circles
+                for red_circle in all_red_circles:
+                    circle_position = (red_circle.get_lat(), red_circle.get_lng())
+                    prisoner_position = (prisoner_last_location.get_lat(), prisoner_last_location.get_lng())
+                    if Distance.coordinate_dis(circle_position, prisoner_position) <= red_circle.get_radius():
+                        # the prisoner is in the circle
+                        if red_circle.get_circle_type() == "1":
+                            # Not allowed in the circle - Problem
+                            is_problem += 1
+                        else:
+                            # allowed only in the circle - Good
+                            is_problem += 0
+                    else:
+                        # the prisoner is out of the circle
+                        if red_circle.get_circle_type() == "1":
+                            # Not allowed in the circle - Good
+                            is_problem += 0
+                        else:
+                            # allowed only in the circle - Problem
+                            is_problem += 1
+
+                # checking if the client didn't sent location for a while
+                if prisoner_time_delta > timedelta(minutes=LOCATIONS_MINUTES_GAP_CHECK):
+                    is_problem += 1
+                else:
+                    is_problem += 0
+
+                # finally - checking the problem checker
+                if is_problem >= 1:
+                    db.change_prisoner_status(prisoner_id, new_status=1)
+                else:
+                    db.change_prisoner_status(prisoner_id, new_status=0)
+                # adding the current prisoner to the list
+                all_new_log_data.append(prisoner_data.get_prisoner_listed())
+
+            else:
+                # in case that no location measured yet
+                db.change_prisoner_status(prisoner_id, new_status=1)
+                all_new_log_data.append(prisoner_data.get_prisoner_listed())
+
         return json.dumps(all_new_log_data)
     except:
         return "LogError"
@@ -54,24 +141,40 @@ def get_all_problems_and_new_alerts(db):
 def add_or_remove_red_circle(content, db):
     try:
         data = json.loads(content["input"])
-        prisoner_id = data[0]
-        lat = data[1]
-        lng = data[2]
+        """
+        data:
+        0 - prisoner_id
+        1 - latitude
+        2 - longitude
+        3 - add/remove circle
+        4 - radius
+        5 - circle_type
+        """
+        # opening data and creating RedCircle
         add_remove_type = data[3]
-        radius = data[4]
-        circle_type = data[5]
+        red_circle_data = DB.RedCircle(None,
+                                       prisoner_id=db.get_prisoner_personal_data_by_national_identifier(data[0]).get_prisoner_id(),
+                                       radius=data[4], lat=data[1], lng=data[2],
+                                       circle_type=data[5])
+
         # function - adding
         if add_remove_type == "ADD":
             # checking radius
-            if int(radius) > 0:
-                db.add_red_circle(prisoner_id, radius, lat, lng, circle_type)
+            if int(red_circle_data.get_radius()) > 0:
+                db.add_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_radius(),
+                                  red_circle_data.get_lat(), red_circle_data.get_lng(),
+                                  red_circle_data.get_circle_type())
                 return "Added Circle"
             else:
                 return "Radius Can`t be 0 or negative! (Error)"
         # function - removing
         elif add_remove_type == "REMOVE":
-            db.remove_red_circle(prisoner_id, lat, lng)
-            return "Removed Circle"
+            try:
+                db.remove_red_circle(red_circle_data.get_prisoner_id(), red_circle_data.get_lat(),
+                                     red_circle_data.get_lng())
+                return "Removed Circle"
+            except:
+                return "Data Base Error!"
         else:
             return "No Such Command! (Error)"
     except:
@@ -81,10 +184,15 @@ def add_or_remove_red_circle(content, db):
 def new_prisoner(content, db):
     try:
         data = json.loads(content["input"])
-        prisoner_national_id = data[0]
-        prisoner_name = data[1]
-        db.insert_new_prisoner(prisoner_id=prisoner_national_id, name=prisoner_name,
-                               national_identifier=prisoner_national_id, status=False)
+        """
+        data:
+        0 - prisoner_id
+        1 - name
+        """
+        prisoner_data = DB.Prisoner(prisoner_id=db.get_new_id(), name=data[1], national_identifier=data[0],
+                                    prisoner_status=False)
+        # inserting the new prisoner into the server
+        db.insert_new_prisoner(prisoner_data, status=False)
         return "Good"
     except:
         return "ValueError"
@@ -93,41 +201,31 @@ def new_prisoner(content, db):
 def prisoner_new_location(content, db):
     try:
         data = json.loads(content["input"])
-        client_national_id = data[0]
-        location_lat = data[1]
-        location_lng = data[2]
-        date = datetime.datetime.now()
-        db.insert_new_location(client_national_id, date, location_lat, location_lng)
-        all_red_circles = db.get_all_prisoner_red_circles(client_national_id)
-        radius_placer = 2
-        location_placer_lat = 3
-        location_placer_lng = 4
-        circle_type_placer = 5
-        is_problem = 0
-        for red_circle in all_red_circles:
-            print("in")
-            if Distance.coordinate_dis((red_circle[location_placer_lat], red_circle[location_placer_lng]),
-                                       (location_lat, location_lng)) <= red_circle[radius_placer]:
-                # the prisoner is in the circle
-                if red_circle[circle_type_placer] == "1":
-                    # Not allowed in the circle - Problem
-                    is_problem += 1
-                else:
-                    # allowed only in the circle - Good
-                    is_problem += 0
-            else:
-                # the prisoner is out of the circle
-                if red_circle[circle_type_placer] == "1":
-                    # Not allowed in the circle - Good
-                    is_problem += 0
-                else:
-                    # allowed only in the circle - Problem
-                    is_problem += 1
-        if is_problem >= 1:
-            db.change_prisoner_status(client_national_id, 1)
+        """
+        data:
+        0 - prisoner_id
+        1 - latitude
+        2 - longitude
+        """
+        # creating timestamp
+        date = datetime.now()
+        # loading the data that received
+        prisoner_national_identifier = data[0]
+        prisoner_id = db.get_prisoner_personal_data_by_national_identifier(
+            prisoner_national_identifier).get_prisoner_id()
+        check = 0
+        all_prisoners = db.get_all_prisoners()
+        for prisoner_check in all_prisoners:
+            # that means that the prisoner still exist
+            if int(prisoner_check.get_prisoner_id()) == int(prisoner_id):
+                check += 1
+        if check == 1:
+            location_data = DB.Location(location_id=None, prisoner_id=prisoner_id, date=date, lat=data[1], lng=data[2])
+            # inserting the new location into the database
+            db.insert_new_location(location_data)
+            return "Good"
         else:
-            db.change_prisoner_status(client_national_id, 0)
-        return "Good"
+            return "The prisoner deleted"
     except:
         return "LocationError"
 
@@ -135,6 +233,8 @@ def prisoner_new_location(content, db):
 def prisoner_unknown_location(content, db):
     prisoner_id = json.loads(content["input"])
     try:
+        # the prisoner status changes to "problem" when the location is unknown -
+        # mostly to alert the police officers that the prisoner isn`t connected
         db.change_prisoner_status(prisoner_id, new_status=1)
         return "GettingPrisonerLocationError"
     except:
@@ -142,7 +242,7 @@ def prisoner_unknown_location(content, db):
         return "GettingPrisonerLocationErrorAndDataBaseError"
 
 
-# in use in get_help_text
+# in use in get_help_text function
 def get_text_from_file(file_name):
     text = open(f"help_center\\" + file_name, "r").read()
     return json.dumps(text)
@@ -151,6 +251,7 @@ def get_text_from_file(file_name):
 def get_help_text(content):
     help_type = content["input"]
     try:
+        # returns the text of the file which requested
         if help_type == "for_users":
             return get_text_from_file("help_for_users.txt")
         elif help_type == "for_admins":
@@ -182,10 +283,7 @@ def commend_checker(content, db):
 
     # command type: sending back all prisoners
     elif content["type"] == "get_all_prisoners_id_and_name_ect":
-        try:
-            return json.dumps(db.get_all_prisoners())
-        except:
-            return "LoadingAllPrisonersForListError"
+        return get_all_prisoners(db)
 
     # command type: get all new things that happened and all problems (status==1)
     elif content["type"] == "get_all_problems_and_new_alerts":
@@ -194,7 +292,6 @@ def commend_checker(content, db):
     # command type: adding and removing red circles (iframe command)
     elif content["type"] == "add_or_remove_red_circle":
         return add_or_remove_red_circle(content, db)
-    # TODO display the data of the red circles somewhere
 
     # command type: inserting new prisoner to DB, from `/prisoner` tab
     elif content["type"] == "new_prisoner":
@@ -279,4 +376,4 @@ def main_page_directing():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host=LOCAL_HOST, debug=True)

@@ -74,7 +74,7 @@
 			}
 			
 			async function loadPrisoner(prisonerData) {
-				if (prisonerData != "Submit Prisoner Error") {
+				if (prisonerData != "Submit Prisoner Error" & prisonerData != "No Location Measured Yet" & prisonerData != "No prisoner in the system") {
 					const thisPrisoner = JSON.parse(prisonerData);
 					/* thisPrisoner[]:
 					0: ID
@@ -153,7 +153,7 @@
 				}
 				
 				else {
-					document.getElementById("DataTag").innerHTML = "Submiting Error or No Location messured yet by the prisoner. </br>Please wait few seconds and try again.";
+					document.getElementById("DataTag").innerHTML = prisonerData;
 					document.getElementById("prisonerID").innerHTML = "";
 					document.getElementById("prisonerDate").innerHTML = "";
 					document.getElementById("prisonerLocation").innerHTML = "";
@@ -207,7 +207,7 @@
 		
 		
 		<!-- select prisoner list --> 
-		<div style="float:left; top:10%; height:70%; width:25%">
+		<div style="float:left; top:10%; height:60%; width:25%">
 
 			<h2>Select Prisoner:</h2>
 			

@@ -31,32 +31,27 @@
 		function LoopCallBack() { 
 			talkToServer("get_all_problems_and_new_alerts", "", UpdateDataToPage);
 		}
-	
-		// the way we appending the new message
-		function CreateMessage(message) {
-			const element = document.createElement('p');
-			element.innerHTML = message + '</br>';
-			return element;
-		}
+
 	
 		// adding alerts to the alert log
 		function UpdateDataToPage(NewData) {
 			const Data = JSON.parse(NewData);
-			const AlertList = document.getElementById("AlertID");
+			var AlertList = document.getElementById("AlertID");
 			console.log(Data);
+			var new_alerts = "";
 			for (const line in Data) {
 				if(Data[line][3] == 1) {
-					AlertList.appendChild(CreateMessage(Data[line][0].toString() + ", Alert!"));
+					new_alerts += Data[line][0].toString() + ", Alert!" + "</br>";
 				}
 				
-				// hello developer! if ou may want to see the "good prisoners" you can append this code lines right here:
+				// hello developer! if you may want to see the "good prisoners" you can append this code lines right here:
 				/*
 				if(Data[line][3] == 0) {
-					LogList.appendChild(CreateMessage(Data[line][0].toString() + ", All Good"));
+					new_alerts += Data[line][0].toString() + ", Good" + "</br>";
 				}
 				*/
 			}
-			AlertList.appendChild(CreateMessage("          "));
+			AlertList.innerHTML = new_alerts  + "</br>" + AlertList.innerHTML;
 		}
 	
 		</script>

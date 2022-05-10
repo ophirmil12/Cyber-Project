@@ -15,10 +15,10 @@ def coordinate_dis(coordinate1, coordinate2):
     lat1, lon1 = radians(coordinate1[0]), radians(coordinate1[1])
     lat2, lon2 = radians(coordinate2[0]), radians(coordinate2[1])
 
-    delta_lon = lon2 - lon1
+    delta_lng = lon2 - lon1
     delta_lat = lat2 - lat1
 
-    a = sin(delta_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(delta_lon / 2) ** 2
+    a = sin(delta_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(delta_lng / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     distance = EARTH_RADIUS * c

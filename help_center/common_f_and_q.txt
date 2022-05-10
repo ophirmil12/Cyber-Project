@@ -1,6 +1,6 @@
-The windows in the main interface do not open! What do i do?
+The windows in the main interface do not open! What do I do?
 Check that the files of the panels are in the static folder, and that the site is opened via the link of the application or the print run of the server.
-Location not accepted from the Prisoner interface!  What do i do?
+Location not accepted from the Prisoner interface!  What do I do?
 Check the location component or its existence on the device, and the browser support in the directory used to obtain the location.
-One of the interfaces does not connect to the server!  What do i do?
+One of the interfaces does not connect to the server!  What do I do?
 Check that the server is enabled, which is printed on the server requests from the interface. If requests are printed check if there is a glitch in the code that handles requests coming from the interfaces.
