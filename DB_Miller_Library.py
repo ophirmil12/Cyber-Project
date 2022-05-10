@@ -2,8 +2,10 @@ import sqlite3
 from random import randint
 
 
-# table for each prisoner
-# row for each location check
+# 3 tables:
+# # all the locations
+# # all the prisoners
+# # all thr red circles
 
 
 class Database:
