@@ -6,7 +6,7 @@ from _datetime import datetime, timedelta
 import Distance_Library as Distance
 import os
 
-# flask argument
+# flask app argument
 app = Flask(__name__)
 
 # constants
@@ -266,7 +266,6 @@ def get_help_text(content):
         return json.dumps("TextFileProblem")
 
 
-# removing prisoner
 def remove_prisoner(content, db):
     try:
         db.remove_prisoner(content["input"])
