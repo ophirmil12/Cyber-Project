@@ -25,7 +25,10 @@
 				const body = await req.text();
 				callback(body);
 			}
-			catch (error) {}
+			catch (error) 
+			{
+				UpdateDataToPage("Server is down or no Internet conection")
+			}
 		}
 	
 		//when pressing the submit button
@@ -76,7 +79,14 @@
 		
 		// after sending the data to the server, showing the response
 		function UpdateDataToPage(NewData) {
-			document.getElementById("responseGeolocation").innerHTML = "Getting Locations: " + NewData;
+			if(NewData == "Good" || NewData == "Server is down or no Internet conection" || NewData == "ValueError" || NewData == "GettingPrisonerLocationError" || NewData == "GettingPrisonerLocationErrorAndDataBaseError")
+			{
+				document.getElementById("responseGeolocation").innerHTML = "Getting Locations: " + NewData;
+			}
+			else
+			{
+				document.getElementById("responseGeolocation").innerHTML = "Getting Locations: " + "Server is down or no Internet conection";
+			}
 		}
 
 		</script>

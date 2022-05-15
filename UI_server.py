@@ -6,7 +6,7 @@ from _datetime import datetime, timedelta
 import Distance_Library as Distance
 import os
 
-# flask argument
+# flask app argument
 app = Flask(__name__)
 
 # constants
@@ -266,7 +266,6 @@ def get_help_text(content):
         return json.dumps("TextFileProblem")
 
 
-# removing prisoner
 def remove_prisoner(content, db):
     try:
         db.remove_prisoner(content["input"])
@@ -327,7 +326,7 @@ def user():
     # getting function type and data from JS
     get_content = request.data
     content = json.loads(get_content.decode())
-    print(content)
+    # print(content) - unnecessary
     # checking what method need to be used
     return commend_checker(content, db)
 

@@ -74,7 +74,7 @@
 			}
 			
 			async function loadPrisoner(prisonerData) {
-				if (prisonerData != "Submit Prisoner Error" & prisonerData != "No Location Measured Yet" & prisonerData != "No prisoner in the system") {
+				if (prisonerData != "Submit Prisoner Error" & prisonerData != "No Location Measured Yet" & prisonerData != "No prisoner in the system" & prisonerData[1] != "<") {
 					const thisPrisoner = JSON.parse(prisonerData);
 					/* thisPrisoner[]:
 					0: ID
@@ -153,7 +153,6 @@
 				}
 				
 				else {
-					document.getElementById("DataTag").innerHTML = prisonerData;
 					document.getElementById("prisonerID").innerHTML = "";
 					document.getElementById("prisonerDate").innerHTML = "";
 					document.getElementById("prisonerLocation").innerHTML = "";
@@ -162,6 +161,16 @@
 					document.getElementById("circlesData").innerHTML = "";
 					document.getElementById("LastLocationTag").innerHTML = "";
 					document.getElementById("CirclesTag").innerHTML = "";
+					
+					if(prisonerData[1] != "<")
+					{
+						document.getElementById("DataTag").innerHTML = prisonerData;
+						
+					}
+					else
+					{
+						document.getElementById("DataTag").innerHTML = "Server or internet is down!";
+					}
 				}	
 			}
 			

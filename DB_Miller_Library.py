@@ -217,7 +217,7 @@ class Database:
         record = (prisoner_id, lat, lng)
         cursor.execute(sql_to_execute, record)
         # change the circles counter
-        self.sequence_counter_change("location", -1)
+        self.sequence_counter_change("red_circles", -1)
 
     # remove red circle from prisoner
     def remove_prisoner(self, prisoner_id):
