@@ -1,5 +1,0 @@
-קבצים להרצה:
-main_server.py
-main_client.py
-UI_server.py
-קישור מתוך הממשק
