@@ -34,24 +34,33 @@
 
 	
 		// adding alerts to the alert log
-		function UpdateDataToPage(NewData) {
-			const Data = JSON.parse(NewData);
+		function UpdateDataToPage(NewData)
+			{
 			var AlertList = document.getElementById("AlertID");
-			console.log(Data);
-			var new_alerts = "";
-			for (const line in Data) {
-				if(Data[line][3] == 1) {
-					new_alerts += Data[line][0].toString() + ", Alert!" + "</br>";
+			if(NewData[0] == "[")
+				{
+				const Data = JSON.parse(NewData);
+				console.log(Data);
+				var new_alerts = "";
+				for (const line in Data) {
+					if(Data[line][3] == 1) {
+						new_alerts += "Prisoner Number " + Data[line][0].toString() + ", Name - " + Data[line][1].toString() + ", Alert!" + "</br>";
+					}
+					
+					// hello developer! if you may want to see the "good prisoners" you can append this code lines right here:
+					/*
+					if(Data[line][3] == 0) {
+						new_alerts += Data[line][0].toString() + ", Good" + "</br>";
+					}
+					*/
 				}
-				
-				// hello developer! if you may want to see the "good prisoners" you can append this code lines right here:
-				/*
-				if(Data[line][3] == 0) {
-					new_alerts += Data[line][0].toString() + ", Good" + "</br>";
-				}
-				*/
+				AlertList.innerHTML = new_alerts  + "</br>" + AlertList.innerHTML;
 			}
-			AlertList.innerHTML = new_alerts  + "</br>" + AlertList.innerHTML;
+			else
+			{
+				AlertList.innerHTML = "Internet or server is down!"  + "</br>" + "</br>" + AlertList.innerHTML;
+				
+			}
 		}
 	
 		</script>

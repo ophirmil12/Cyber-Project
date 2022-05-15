@@ -326,7 +326,7 @@ def user():
     # getting function type and data from JS
     get_content = request.data
     content = json.loads(get_content.decode())
-    print(content)
+    # print(content) - unnecessary
     # checking what method need to be used
     return commend_checker(content, db)
 
